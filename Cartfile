@@ -1,0 +1,6 @@
+github "natestedman/ArrayLoader" ~> 0.3.0
+github "natestedman/Codable" ~> 0.7.0
+github "natestedman/Endpoint" ~> 0.2.0
+github "natestedman/NSErrorRepresentable" ~> 0.6.0
+github "natestedman/Shirley" ~> 0.7.1
+github "nolanw/HTMLReader" ~> 2.0

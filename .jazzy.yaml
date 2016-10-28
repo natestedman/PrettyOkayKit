@@ -1,0 +1,47 @@
+custom_categories:
+    - name: API
+      children:
+          - APIClient
+          
+    - name: Authentication
+      children:
+          - Authentication
+          - AuthenticationType
+          - AuthenticationController
+
+    - name: Errors
+      children:
+          - APIClientLoadingError
+          - AuthenticationError
+          - CSRFError
+          - DecodeKeyError
+          - DecodeRawError
+          - InvalidURLError
+          - ProductRelationsError
+          - WantClientError
+
+    - name: Models
+      children:
+          - ModelType
+          - ModelIdentifier
+          - Good
+          - Product
+          - ProductRelations
+          - User
+          
+    - name: Filters
+      children:
+        - Filters
+        - FilterComponent
+        - Category
+        - Gender
+        - Price
+        
+    - name: Sorting
+      children:
+          - Order
+
+    - name: Wanting
+      children:
+          - WantClient
+          - WantState

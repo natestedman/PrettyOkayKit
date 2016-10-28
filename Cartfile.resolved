@@ -1,0 +1,8 @@
+github "natestedman/Codable" "0.7.0"
+github "natestedman/Endpoint" "0.2.0"
+github "nolanw/HTMLReader" "v2.0"
+github "natestedman/NSErrorRepresentable" "0.6.0"
+github "antitypical/Result" "2.1.3"
+github "ReactiveCocoa/ReactiveCocoa" "v4.2.2"
+github "natestedman/ArrayLoader" "0.3.0"
+github "natestedman/Shirley" "0.7.1"
