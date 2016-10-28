@@ -9,4 +9,3 @@ git:
 script:
   - /usr/local/bin/carthage bootstrap --platform iOS --no-use-binaries
   - xcodebuild -project PrettyOkayKit.xcodeproj -scheme PrettyOkayKit
-  - xcodebuild test -project PrettyOkayKit.xcodeproj -scheme PrettyOkayKit
