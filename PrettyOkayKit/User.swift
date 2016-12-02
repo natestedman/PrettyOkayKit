@@ -18,7 +18,7 @@ import Foundation
 // MARK: - Users
 
 /// A user on Very Goods.
-public struct User: ModelType
+public struct User: ModelType, Equatable
 {
     // MARK: - Model
 
@@ -92,7 +92,7 @@ extension User: Decodable
             avatarURLCentered126: try? decodeURL(key: "avatar_url_centered_126", from: encoded),
             coverURL: try? decodeURL(key: "cover_image", from: encoded),
             coverLargeURL: try? decodeURL(key: "cover_image_big_url", from: encoded),
-            coverThumbURL: try? decodeURL(key: "cover_thumb_url", from: encoded),
+            coverThumbURL: try? decodeURL(key: "cover_image_thumb_url", from: encoded),
             goodsCount: try decode(key: "good_count", from: encoded)
         )
     }
@@ -104,4 +104,21 @@ extension User: CustomStringConvertible
     {
         return "User \(self.identifier) (@\(self.username))"
     }
+}
+
+@warn_unused_result
+public func ==(lhs: User, rhs: User) -> Bool
+{
+    return lhs.identifier == rhs.identifier
+        && lhs.username == rhs.username
+        && lhs.name == rhs.name
+        && lhs.biography == rhs.biography
+        && lhs.location == rhs.location
+        && lhs.URL == rhs.URL
+        && lhs.avatarURL == rhs.avatarURL
+        && lhs.avatarURLCentered126 == rhs.avatarURLCentered126
+        && lhs.coverURL == rhs.coverURL
+        && lhs.coverLargeURL == rhs.coverLargeURL
+        && lhs.coverThumbURL == rhs.coverThumbURL
+        && lhs.goodsCount == rhs.goodsCount
 }

@@ -32,7 +32,7 @@
 		4397EEBE1CAD758C00D8A5D6 /* NSErrorRepresentable.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4397EEB81CAD71E100D8A5D6 /* NSErrorRepresentable.framework */; };
 		43A8DB091C6AA23D007D4CF7 /* PrettyOkayKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A8DB081C6AA23D007D4CF7 /* PrettyOkayKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		43A8DB101C6AA23D007D4CF7 /* PrettyOkayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43A8DB051C6AA23D007D4CF7 /* PrettyOkayKit.framework */; };
-		43A8DB151C6AA23D007D4CF7 /* PrettyOkayKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A8DB141C6AA23D007D4CF7 /* PrettyOkayKitTests.swift */; };
+		43A8DB151C6AA23D007D4CF7 /* UserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A8DB141C6AA23D007D4CF7 /* UserTests.swift */; };
 		43A8DB301C6AA346007D4CF7 /* Filters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A8DB2B1C6AA346007D4CF7 /* Filters.swift */; };
 		43A8DB311C6AA346007D4CF7 /* Good.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A8DB2C1C6AA346007D4CF7 /* Good.swift */; };
 		43A8DB321C6AA346007D4CF7 /* ModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A8DB2D1C6AA346007D4CF7 /* ModelType.swift */; };
@@ -104,7 +104,7 @@
 		43A8DB081C6AA23D007D4CF7 /* PrettyOkayKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrettyOkayKit.h; sourceTree = "<group>"; };
 		43A8DB0A1C6AA23D007D4CF7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		43A8DB0F1C6AA23D007D4CF7 /* PrettyOkayKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PrettyOkayKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		43A8DB141C6AA23D007D4CF7 /* PrettyOkayKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrettyOkayKitTests.swift; sourceTree = "<group>"; };
+		43A8DB141C6AA23D007D4CF7 /* UserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTests.swift; sourceTree = "<group>"; };
 		43A8DB161C6AA23D007D4CF7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		43A8DB2B1C6AA346007D4CF7 /* Filters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filters.swift; sourceTree = "<group>"; };
 		43A8DB2C1C6AA346007D4CF7 /* Good.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Good.swift; sourceTree = "<group>"; };
@@ -225,7 +225,7 @@
 		43A8DB131C6AA23D007D4CF7 /* PrettyOkayKitTests */ = {
 			isa = PBXGroup;
 			children = (
-				43A8DB141C6AA23D007D4CF7 /* PrettyOkayKitTests.swift */,
+				43A8DB141C6AA23D007D4CF7 /* UserTests.swift */,
 				43A8DB161C6AA23D007D4CF7 /* Info.plist */,
 			);
 			path = PrettyOkayKitTests;
@@ -396,7 +396,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				43A8DB151C6AA23D007D4CF7 /* PrettyOkayKitTests.swift in Sources */,
+				43A8DB151C6AA23D007D4CF7 /* UserTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
