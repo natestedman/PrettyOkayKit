@@ -34,7 +34,7 @@ extension Decodable where Encoded == [String:AnyObject]
     {
         let URLString: String = try decode(key: key, from: encoded)
 
-        if let URL = NSURL(string: URLString)
+        if let URL = NSURL(string: URLString) where URL.scheme == "http" || URL.scheme == "https"
         {
             return URL
         }
