@@ -18,7 +18,7 @@ import Foundation
 // MARK: - Products
 
 /// A product on Very Goods.
-public struct Product: ModelType
+public struct Product: ModelType, Equatable
 {
     // MARK: - Model
 
@@ -132,4 +132,19 @@ extension String
     {
         return String(characters.dropFirst())
     }
+}
+
+@warn_unused_result
+public func ==(lhs: Product, rhs: Product) -> Bool
+{
+    return lhs.identifier == rhs.identifier
+        && lhs.title == rhs.title
+        && lhs.formattedPrice == rhs.formattedPrice
+        && lhs.gender == rhs.gender
+        && lhs.imageURL == rhs.imageURL
+        && lhs.mediumImageURL == rhs.mediumImageURL
+        && lhs.originalImageURL == rhs.originalImageURL
+        && lhs.displayDomain == rhs.displayDomain
+        && lhs.sourceDomain == rhs.sourceDomain
+        && lhs.goodDeletePath == rhs.goodDeletePath
 }
