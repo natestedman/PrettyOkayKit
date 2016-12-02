@@ -78,6 +78,7 @@ extension Filters
 /// - parameter rhs: The second filters value.
 ///
 /// - returns: If the values are equal, `true`.
+@warn_unused_result
 public func ==(lhs: Filters, rhs: Filters) -> Bool
 {
     return lhs.category == rhs.category && lhs.gender == rhs.gender && lhs.price == rhs.price

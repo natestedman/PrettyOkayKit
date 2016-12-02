@@ -96,6 +96,7 @@ extension Authentication
 /// - parameter rhs: The second authentication value.
 ///
 /// - returns: If the values are equal, `true`.
+@warn_unused_result
 public func ==(lhs: Authentication, rhs: Authentication) -> Bool
 {
     return lhs.token.isEqual(rhs.token) && lhs.session.isEqual(rhs.token)
