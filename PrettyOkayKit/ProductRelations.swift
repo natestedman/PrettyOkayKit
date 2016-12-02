@@ -17,7 +17,7 @@ import Foundation
 // MARK: - Product Relations
 
 /// A structure describing models associated with a `Product`.
-public struct ProductRelations
+public struct ProductRelations: Equatable
 {
     // MARK: - Initialization
 
@@ -40,4 +40,10 @@ public struct ProductRelations
 
     /// The users that have added the product to their goods.
     public let users: [User]
+}
+
+@warn_unused_result
+public func ==(lhs: ProductRelations, rhs: ProductRelations) -> Bool
+{
+    return lhs.relatedProducts == rhs.relatedProducts && lhs.users == rhs.users
 }
