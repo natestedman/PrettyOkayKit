@@ -17,7 +17,7 @@ import Codable
 // MARK: - Goods
 
 /// A relationship between a `User` and a `Product`.
-public struct Good: ModelType
+public struct Good: ModelType, Equatable
 {
     // MARK: - Model
 
@@ -64,4 +64,10 @@ extension Good: CustomStringConvertible
     {
         return "Good (\(product)) -> (\(owner))"
     }
+}
+
+@warn_unused_result
+public func ==(lhs: Good, rhs: Good) -> Bool
+{
+    return lhs.identifier == rhs.identifier && lhs.product == rhs.product && lhs.owner == rhs.owner
 }
