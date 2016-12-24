@@ -9,6 +9,11 @@ custom_categories:
           - AuthenticationType
           - AuthenticationController
 
+    - name: Coding
+      children:
+          - Decoding
+          - Encoding
+
     - name: Errors
       children:
           - APIClientLoadingError

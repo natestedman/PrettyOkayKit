@@ -12,7 +12,6 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-import Codable
 import Endpoint
 import Foundation
 import Result
@@ -48,9 +47,9 @@ internal struct WantEndpoint: CSRFTokenEndpointType
     let CSRFToken: String
 }
 
-extension WantEndpoint: Encodable
+extension WantEndpoint: Encoding
 {
-    func encode() -> [String:AnyObject]
+    var encoded: [String : AnyObject]
     {
         return ["product_id": identifier]
     }
@@ -132,13 +131,11 @@ protocol CSRFTokenEndpointType
 }
 
 // MARK: - Encodable Endpoint Extension
-extension Encodable where Self: BodyProviderType, Self: HeaderFieldsProviderType, Self: CSRFTokenEndpointType
+extension Encoding where Self: BodyProviderType, Self: HeaderFieldsProviderType, Self: CSRFTokenEndpointType
 {
     var body: BodyType?
     {
-        return (encode() as? AnyObject).flatMap({ any in
-            try? NSJSONSerialization.dataWithJSONObject(any, options: [])
-        })
+        return try? NSJSONSerialization.dataWithJSONObject(encoded, options: [])
     }
 
     var headerFields: [String: String]

@@ -12,50 +12,7 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-import Codable
 import NSErrorRepresentable
-
-extension Decodable where Encoded == [String:AnyObject]
-{
-    // MARK: - JSON Decoding Utility Functions
-    static func decode<T>(key key: String, from encoded: [String:AnyObject]) throws -> T
-    {
-        if let t = encoded[key] as? T
-        {
-            return t
-        }
-        else
-        {
-            throw DecodeKeyError(key: key)
-        }
-    }
-
-    static func decodeURL(key key: String, from encoded: [String:AnyObject]) throws -> NSURL
-    {
-        let URLString: String = try decode(key: key, from: encoded)
-
-        if let URL = NSURL(string: URLString) where URL.scheme == "http" || URL.scheme == "https"
-        {
-            return URL
-        }
-        else
-        {
-            throw InvalidURLError(URLString: URLString, key: key)
-        }
-    }
-}
-
-func decodeRaw<Value: RawRepresentable>(raw: Value.RawValue) throws -> Value
-{
-    if let value = Value(rawValue: raw)
-    {
-        return value
-    }
-    else
-    {
-        throw DecodeRawError(raw: raw)
-    }
-}
 
 // MARK: - Decoding Errors
 

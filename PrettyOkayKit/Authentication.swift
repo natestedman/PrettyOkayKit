@@ -12,7 +12,6 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-import Codable
 import Foundation
 
 // MARK: - Authentication
@@ -102,11 +101,9 @@ public func ==(lhs: Authentication, rhs: Authentication) -> Bool
     return lhs.token.isEqual(rhs.token) && lhs.session.isEqual(rhs.token)
 }
 
-extension Authentication: Codable
+extension Authentication: Decoding, Encoding
 {
-    // MARK: - Codable
-    public typealias Encoded = [String:AnyObject]
-
+    // MARK: - Coding
     /// Attempts to decode an authentication value.
     ///
     /// - parameter encoded: The encoded representation.
@@ -114,21 +111,21 @@ extension Authentication: Codable
     /// - throws: Errors encounted while decoding.
     ///
     /// - returns: A decoded authentication value.
-    public static func decode(encoded: Encoded) throws -> Authentication
+    public init(encoded: [String : AnyObject]) throws
     {
-        guard let token = NSHTTPCookie(properties: try decode(key: "token", from: encoded)) else {
+        guard let token = NSHTTPCookie(properties: try encoded.decode("token")) else {
             throw DecodeKeyError(key: "token")
         }
 
-        guard let session = NSHTTPCookie(properties: try decode(key: "session", from: encoded)) else {
+        guard let session = NSHTTPCookie(properties: try encoded.decode("session")) else {
             throw DecodeKeyError(key: "session")
         }
 
-        return Authentication(username: try decode(key: "username", from: encoded), token: token, session: session)
+        self.init(username: try encoded.decode("username"), token: token, session: session)
     }
 
     /// Encodes the authentication value.
-    public func encode() -> Encoded
+    public var encoded: [String : AnyObject]
     {
         return [
             "username": username,

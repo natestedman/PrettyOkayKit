@@ -12,8 +12,6 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-import Codable
-
 // MARK: - Goods
 
 /// A relationship between a `User` and a `Product`.
@@ -33,10 +31,9 @@ public struct Good: ModelType, Equatable
     public let owner: User
 }
 
-extension Good: Decodable
+extension Good: Decoding
 {
-    // MARK: - Decodable
-    public typealias Encoded = [String:AnyObject]
+    // MARK: - Decoding
 
     /// Attempts to decode a `Good`.
     ///
@@ -45,15 +42,15 @@ extension Good: Decodable
     /// - throws: An error encountered while decoding the `Good`.
     ///
     /// - returns: A `Good` value, if successful.
-    public static func decode(encoded: Encoded) throws -> Good
+    public init(encoded: [String : AnyObject]) throws
     {
-        let embedded: [String:AnyObject] = try decode(key: "_embedded", from: encoded)
-        let links: [String:AnyObject] = try decode(key: "_links", from: encoded)
-        
-        return Good(
-            identifier: try decode(key: "id", from: encoded),
-            product: try Product.decode(try decode(key: "product", from: embedded), links: links),
-            owner: try User.decode(try decode(key: "owner", from: embedded))
+        let embedded = try encoded.sub("_embedded")
+        let links = try encoded.sub("_links")
+
+        self.init(
+            identifier: try encoded.decode("id"),
+            product: try Product(encoded: embedded.decode("product"), links: links),
+            owner: try User(encoded: embedded.decode("owner"))
         )
     }
 }

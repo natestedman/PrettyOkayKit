@@ -82,8 +82,8 @@ extension ProductRelationsEndpoint: ProcessingType
             Result(attempt: {
                 try rethrowNSError(
                     ProductRelations(
-                        relatedProducts: try encodedRelated.map(Product.decode),
-                        users: try encodedUsers.map(User.decode)
+                        relatedProducts: try encodedRelated.map(Product.init),
+                        users: try encodedUsers.map(User.init)
                     )
                 )
             })

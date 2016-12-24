@@ -12,8 +12,8 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-import Codable
 import Foundation
+import ReactiveCocoa
 
 // MARK: - Products
 
@@ -71,10 +71,9 @@ public struct Product: ModelType, Equatable
     }
 }
 
-extension Product: Decodable
+extension Product: Decoding
 {
-    // MARK: - Decodable
-    public typealias Encoded = [String:AnyObject]
+    // MARK: - Decoding
 
     /// Attempts to decode a `Product`.
     ///
@@ -83,9 +82,9 @@ extension Product: Decodable
     /// - throws: An error encountered while decoding the `Product`.
     ///
     /// - returns: A `Product` value, if successful.
-    public static func decode(encoded: Encoded) throws -> Product
+    public init(encoded: [String : AnyObject]) throws
     {
-        return try decode(encoded, links: nil)
+        try self.init(encoded: encoded, links: nil)
     }
 
     /// Attempts to decode a `Product`.
@@ -96,32 +95,28 @@ extension Product: Decodable
     /// - throws: An error encountered while decoding the `Product`.
     ///
     /// - returns: A `Product` value, if successful.
-    public static func decode(encoded: Encoded, links: [String:AnyObject]?) throws -> Product
+    public init(encoded: [String : AnyObject], links: [String : AnyObject]?) throws
     {
         // fall back on neutral gender if not parsed correctly, gendered items are silly anyways
-        let genderString: String? = try? decode(key: "gender", from: encoded)
+        let genderString: String? = try? encoded.decode("gender")
         let gender = genderString.flatMap({ string in Gender(rawValue: string) }) ?? .Neutral
 
-        let goodDeletePath: String? = try? decode(
-            key: "href",
-            from: decode(
-                key: "good:delete",
-                from: links ?? decode(key: "_links", from: encoded)
-            )
-        )
+        // if this is a product associated with a `Good`, determine its deletion path
+        let linksToUse: [String:AnyObject]? = try? links ?? encoded.decode("_links")
+        let goodDeletePath: String?? = try? linksToUse?.sub("good:delete").decode("href")
 
-        return Product(
-            identifier: try decode(key: "id", from: encoded),
-            title: try decode(key: "title", from: encoded),
-            formattedPrice: try decode(key: "formatted_price", from: encoded),
+        self.init(
+            identifier: try encoded.decode("id"),
+            title: try encoded.decode("title"),
+            formattedPrice: try encoded.decode("formatted_price"),
             gender: gender,
-            imageURL: try? decodeURL(key: "image_url", from: encoded),
-            mediumImageURL: try? decodeURL(key: "medium_image_url", from: encoded),
-            originalImageURL: try? decodeURL(key: "orig_image_url", from: encoded),
+            imageURL: try? encoded.decodeURL("image_url"),
+            mediumImageURL: try? encoded.decodeURL("medium_image_url"),
+            originalImageURL: try? encoded.decodeURL("orig_image_url"),
             displayDomain: encoded["domain_for_display"] as? String,
-            sourceDomain: try? decodeURL(key: "source_domain", from: encoded),
-            sourceURL: try? decodeURL(key: "source_url", from: encoded),
-            goodDeletePath: goodDeletePath?.removeLeadingCharacter
+            sourceDomain: try? encoded.decodeURL("source_domain"),
+            sourceURL: try? encoded.decodeURL("source_url"),
+            goodDeletePath: goodDeletePath??.removeLeadingCharacter
         )
     }
 }

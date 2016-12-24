@@ -53,7 +53,7 @@ final class UserTests: XCTestCase
             "username":"test"
         ]
 
-        XCTAssertEqual(try? User.decode(encoded), User(
+        XCTAssertEqual(try? User(encoded: encoded), User(
             identifier: 1,
             username: "test", name: "Test",
             biography: nil,
@@ -104,7 +104,7 @@ final class UserTests: XCTestCase
             "username":"test"
         ]
 
-        XCTAssertEqual(try? User.decode(encoded), User(
+        XCTAssertEqual(try? User(encoded: encoded), User(
             identifier: 1,
             username: "test", name: "Test",
             biography: "Test Bio",

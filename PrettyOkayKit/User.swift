@@ -12,7 +12,6 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-import Codable
 import Foundation
 
 // MARK: - Users
@@ -67,10 +66,9 @@ public struct User: ModelType, Equatable
     public let goodsCount: Int
 }
 
-extension User: Decodable
+extension User: Decoding
 {
-    // MARK: - Decodable
-    public typealias Encoded = [String:AnyObject]
+    // MARK: - Decoding
 
     /// Attempts to decode a `User`.
     ///
@@ -79,21 +77,21 @@ extension User: Decodable
     /// - throws: An error encountered while decoding the `User`.
     ///
     /// - returns: A `User` value, if successful.
-    public static func decode(encoded: Encoded) throws -> User
+    public init(encoded: [String : AnyObject]) throws
     {
-        return User(
-            identifier: try decode(key: "id", from: encoded),
-            username: try decode(key: "username", from: encoded),
+        self.init(
+            identifier: try encoded.decode("id"),
+            username: try encoded.decode("username"),
             name: encoded["name"] as? String,
             biography: encoded["bio"] as? String,
             location: encoded["location"] as? String,
-            URL: try? decodeURL(key: "url", from: encoded),
-            avatarURL: try? decodeURL(key: "avatar_url", from: encoded),
-            avatarURLCentered126: try? decodeURL(key: "avatar_url_centered_126", from: encoded),
-            coverURL: try? decodeURL(key: "cover_image", from: encoded),
-            coverLargeURL: try? decodeURL(key: "cover_image_big_url", from: encoded),
-            coverThumbURL: try? decodeURL(key: "cover_image_thumb_url", from: encoded),
-            goodsCount: try decode(key: "good_count", from: encoded)
+            URL: try? encoded.decodeURL("url"),
+            avatarURL: try? encoded.decodeURL("avatar_url"),
+            avatarURLCentered126: try? encoded.decodeURL("avatar_url_centered_126"),
+            coverURL: try? encoded.decodeURL("cover_image"),
+            coverLargeURL: try? encoded.decodeURL("cover_image_big_url"),
+            coverThumbURL: try? encoded.decodeURL("cover_image_thumb_url"),
+            goodsCount: try encoded.decode("good_count")
         )
     }
 }

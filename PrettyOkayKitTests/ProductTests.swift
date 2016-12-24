@@ -80,7 +80,7 @@ final class ProductTests: XCTestCase
     {
         let encoded = self.encoded(links: linksNoDelete)
 
-        XCTAssertEqual(try? Product.decode(encoded), Product(
+        XCTAssertEqual(try? Product(encoded: encoded), Product(
             identifier: 1,
             title: "Test",
             formattedPrice: "$25-$50",
@@ -99,7 +99,7 @@ final class ProductTests: XCTestCase
     {
         let encoded = self.encoded(links: linksWithDelete)
 
-        XCTAssertEqual(try? Product.decode(encoded), Product(
+        XCTAssertEqual(try? Product(encoded: encoded), Product(
             identifier: 1,
             title: "Test",
             formattedPrice: "$25-$50",
@@ -118,7 +118,7 @@ final class ProductTests: XCTestCase
     {
         let encoded = self.encoded(links: linksNoDelete)
 
-        XCTAssertEqual(try? Product.decode(encoded, links: linksNoDelete), Product(
+        XCTAssertEqual(try? Product(encoded: encoded, links: linksNoDelete), Product(
             identifier: 1,
             title: "Test",
             formattedPrice: "$25-$50",
@@ -137,7 +137,7 @@ final class ProductTests: XCTestCase
     {
         let encoded = self.encoded(links: linksNoDelete)
 
-        XCTAssertEqual(try? Product.decode(encoded, links: linksWithDelete), Product(
+        XCTAssertEqual(try? Product(encoded: encoded, links: linksWithDelete), Product(
             identifier: 1,
             title: "Test",
             formattedPrice: "$25-$50",

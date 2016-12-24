@@ -13,7 +13,6 @@
 // PERFORMANCE OF THIS SOFTWARE.
 
 import ArrayLoader
-import Codable
 import Endpoint
 import Foundation
 import NSErrorRepresentable
@@ -39,7 +38,7 @@ extension ProcessingType where Output == ()
 
 protocol DecodableEmbeddedArrayProcessingType: ProcessingType
 {
-    associatedtype Embedded: Decodable
+    associatedtype Embedded: Decoding
 
     var embeddedKey: String { get }
 }
@@ -58,7 +57,7 @@ extension DecodableEmbeddedArrayProcessingType where Input == AnyObject, Output 
 
         do
         {
-            return .Success(try rethrowNSError(try array.map(Embedded.decodeAny)))
+            return .Success(try rethrowNSError(try array.map(Embedded.init)))
         }
         catch let error as NSError
         {

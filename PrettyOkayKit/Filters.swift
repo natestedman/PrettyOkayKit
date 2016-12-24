@@ -12,7 +12,6 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-import Codable
 import Foundation
 
 // MARK: - Filters
@@ -84,32 +83,31 @@ public func ==(lhs: Filters, rhs: Filters) -> Bool
     return lhs.category == rhs.category && lhs.gender == rhs.gender && lhs.price == rhs.price
 }
 
-extension Filters: Codable
+extension Filters: Decoding, Encoding
 {
-    // MARK: - Codable
-    public typealias Encoded = [String:AnyObject]
+    // MARK: - Coding
 
     /// Attempts to decode a `Filters` value from an encoded dictionary representation.
     ///
     /// - parameter encoded: An encoded dictionary representation.
     ///
     /// - throws: Errors encountered during decoding.
-    public static func decode(encoded: [String:AnyObject]) throws -> Filters
+    public init(encoded: [String : AnyObject]) throws
     {
         func decodeSet<Component: RawRepresentable>(input: [Component.RawValue]) throws -> Set<Component>
         {
             return try Set(input.map(decodeRaw))
         }
 
-        return Filters(
-            price: try decodeSet(decode(key: priceKey, from: encoded)),
-            gender: try decodeSet(decode(key: genderKey, from: encoded)),
-            category: try decodeSet(decode(key: categoryKey, from: encoded))
+        self.init(
+            price: try decodeSet(encoded.decode(Filters.priceKey)),
+            gender: try decodeSet(encoded.decode(Filters.genderKey)),
+            category: try decodeSet(encoded.decode(Filters.categoryKey))
         )
     }
 
     /// Encodes a `Filters` value to a dictionary representation.
-    public func encode() -> [String:AnyObject]
+    public var encoded: [String : AnyObject]
     {
         return [
             Filters.priceKey: price.map({ $0.rawValue }),
@@ -118,7 +116,7 @@ extension Filters: Codable
         ]
     }
 
-    // MARK: - Codable Keys
+    // MARK: - Coding Keys
     private static let priceKey = "price"
     private static let genderKey = "gender"
     private static let categoryKey = "category"
