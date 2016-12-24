@@ -42,6 +42,12 @@ public struct ProductRelations: Equatable
     public let users: [User]
 }
 
+/// Equates two `ProductRelations` values.
+///
+/// - parameter lhs: The first product relations value.
+/// - parameter rhs: The second product relations value.
+///
+/// - returns: If the values are equal, `true`.
 @warn_unused_result
 public func ==(lhs: ProductRelations, rhs: ProductRelations) -> Bool
 {

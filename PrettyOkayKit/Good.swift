@@ -66,6 +66,12 @@ extension Good: CustomStringConvertible
     }
 }
 
+/// Equates two `Good` values.
+///
+/// - parameter lhs: The first good value.
+/// - parameter rhs: The second good value.
+///
+/// - returns: If the values are equal, `true`.
 @warn_unused_result
 public func ==(lhs: Good, rhs: Good) -> Bool
 {

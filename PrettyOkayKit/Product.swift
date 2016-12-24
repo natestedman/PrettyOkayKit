@@ -134,6 +134,12 @@ extension String
     }
 }
 
+/// Equates two `Product` values.
+///
+/// - parameter lhs: The first product value.
+/// - parameter rhs: The second product value.
+///
+/// - returns: If the values are equal, `true`.
 @warn_unused_result
 public func ==(lhs: Product, rhs: Product) -> Bool
 {

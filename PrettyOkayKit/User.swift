@@ -106,6 +106,12 @@ extension User: CustomStringConvertible
     }
 }
 
+/// Equates two `User` values.
+///
+/// - parameter lhs: The first user value.
+/// - parameter rhs: The second user value.
+///
+/// - returns: If the values are equal, `true`.
 @warn_unused_result
 public func ==(lhs: User, rhs: User) -> Bool
 {
