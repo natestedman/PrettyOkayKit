@@ -14,7 +14,7 @@
 
 import Endpoint
 import Foundation
-import ReactiveCocoa
+import ReactiveSwift
 import Shirley
 
 // MARK: - Authenticating
@@ -35,24 +35,24 @@ public final class AuthenticationController
         self.username = username
         self.password = password
 
-        self.session = NoRedirectsSession(configuration: NSURLSessionConfiguration.ephemeralSessionConfiguration())
-            .HTTPSession()
+        self.session = NoRedirectsSession(configuration: URLSessionConfiguration.ephemeral)
+            .httpResponse
             .raiseHTTPErrors()
-            .mapRequests({ request in request.request! })
+            .mapRequests({ $0.request! })
     }
 
     // MARK: - Session
 
     /// The session to use for authentication URL requests.
-    private let session: Session<AnyEndpoint, Message<NSHTTPURLResponse, NSData>, NSError>
+    fileprivate let session: Session<AnyEndpoint, Message<HTTPURLResponse, Data>, NSError>
 
     // MARK: - Username and Password
 
     /// The username to use for authentication.
-    private let username: String
+    fileprivate let username: String
 
     /// The password to use for authentication.
-    private let password: String
+    fileprivate let password: String
 }
 
 extension AuthenticationController
@@ -62,11 +62,17 @@ extension AuthenticationController
     /// A producer for authenticating with `username` and `password`.
     public func authenticationProducer() -> SignalProducer<Authentication, NSError>
     {
-        return session.outputProducerForRequest(CSRFEndpoint(purpose: .Login))
-            .delay(1, onScheduler: QueueScheduler.mainQueueScheduler)
-            .map({ token, cookies in
-                AuthenticationEndpoint(username: self.username, password: self.password, token: token, cookies: cookies)
+        return session.outputProducer(for: CSRFEndpoint(purpose: .login))
+            .delay(1, on: QueueScheduler.main)
+            .flatMap(FlattenStrategy.concat, transform: { token, cookies -> SignalProducer<Authentication, NSError> in
+                let endpoint = AuthenticationEndpoint(
+                    username: self.username,
+                    password: self.password,
+                    token: token,
+                    cookies: cookies
+                )
+
+                return self.session.outputProducer(for: endpoint)
             })
-            .flatMap(.Concat, transform: self.session.outputProducerForRequest)
     }
 }

@@ -15,7 +15,6 @@
 import ArrayLoader
 import Endpoint
 import Foundation
-import NSErrorRepresentable
 import Result
 
 // MARK: - Processing Type
@@ -23,16 +22,16 @@ protocol ProcessingType
 {
     associatedtype Input
     associatedtype Output
-    associatedtype Error: ErrorType
+    associatedtype Error: Swift.Error
 
-    func resultForInput(input: Input) -> Result<Output, Error>
+    func resultForInput(_ input: Input) -> Result<Output, Error>
 }
 
 extension ProcessingType where Output == ()
 {
-    func resultForInput(input: Input) -> Result<Output, Error>
+    func resultForInput(_ input: Input) -> Result<Output, Error>
     {
-        return .Success(())
+        return .success(())
     }
 }
 
@@ -43,31 +42,31 @@ protocol DecodableEmbeddedArrayProcessingType: ProcessingType
     var embeddedKey: String { get }
 }
 
-extension DecodableEmbeddedArrayProcessingType where Input == AnyObject, Output == [Embedded]
+extension DecodableEmbeddedArrayProcessingType where Input == Any, Output == [Embedded]
 {
-    func resultForInput(input: Input) -> Result<Output, NSError>
+    func resultForInput(_ input: Input) -> Result<Output, NSError>
     {
-        guard let encoded = (input as? [String:AnyObject])?["_embedded"] as? [String:AnyObject] else {
-            return .Failure(DecodeKeyError(key: "_embedded").NSError)
+        guard let encoded = (input as? [String:Any])?["_embedded"] as? [String:Any] else {
+            return .failure(DecodeKeyError(key: "_embedded") as NSError)
         }
 
-        guard let array = encoded[embeddedKey] as? [AnyObject] else {
-            return .Failure(DecodeKeyError(key: embeddedKey).NSError)
+        guard let array = encoded[embeddedKey] as? [Any] else {
+            return .failure(DecodeKeyError(key: embeddedKey) as NSError)
         }
 
         do
         {
-            return .Success(try rethrowNSError(try array.map(Embedded.init)))
+            return .success(try array.map(Embedded.init))
         }
         catch let error as NSError
         {
-            return .Failure(error)
+            return .failure(error)
         }
     }
 }
 
 // MARK: - Paginated Endpoints
-protocol PageEndpointType: BaseURLEndpointType, MethodProviderType
+protocol PageEndpoint: BaseURLEndpoint, HTTPMethodProvider
 {
     /// The page type for this endpoint.
     associatedtype Page: QueryItemsRepresentable
@@ -79,24 +78,24 @@ protocol PageEndpointType: BaseURLEndpointType, MethodProviderType
     var limit: Int { get }
 }
 
-extension PageEndpointType where Self: MethodProviderType
+extension PageEndpoint where Self: HTTPMethodProvider
 {
-    var method: Endpoint.Method { return .Get }
+    var httpMethod: HTTPMethod { return .get }
 }
 
-extension PageEndpointType
+extension PageEndpoint
 {
     /// The basic query items needed to load this endpoint.
-    var baseQueryItems: [NSURLQueryItem]
+    var baseQueryItems: [URLQueryItem]
     {
-        return [NSURLQueryItem(name: "limit", value: "\(limit)")] + page.queryItems
+        return [URLQueryItem(name: "limit", value: "\(limit)")] + page.queryItems
     }
 }
 
-extension PageEndpointType where Self: QueryItemsProviderType
+extension PageEndpoint where Self: QueryItemsProvider
 {
     /// The query items for this endpoint.
-    var queryItems: [NSURLQueryItem]
+    var queryItems: [URLQueryItem]
     {
         return baseQueryItems
     }
@@ -118,13 +117,13 @@ struct GoodsEndpoint
     let limit: Int
 }
 
-extension GoodsEndpoint: PageEndpointType, QueryItemsProviderType, RelativeURLStringProviderType
+extension GoodsEndpoint: PageEndpoint, QueryItemsProvider, RelativeURLStringProvider
 {
     /// `"users/[username]/goods"`.
     var relativeURLString: String { return "users/\(username.pathEscaped)/goods" }
 
     /// The query items for the goods endpoint.
-    var queryItems: [NSURLQueryItem]
+    var queryItems: [URLQueryItem]
     {
         return baseQueryItems + filters.queryItems
     }
@@ -132,7 +131,7 @@ extension GoodsEndpoint: PageEndpointType, QueryItemsProviderType, RelativeURLSt
 
 extension GoodsEndpoint: DecodableEmbeddedArrayProcessingType
 {
-    typealias Input = AnyObject
+    typealias Input = Any
     typealias Output = [Embedded]
     typealias Error = NSError
     typealias Embedded = Good
@@ -153,13 +152,13 @@ struct ProductsEndpoint
     let limit: Int
 }
 
-extension ProductsEndpoint: PageEndpointType, QueryItemsProviderType, RelativeURLStringProviderType
+extension ProductsEndpoint: PageEndpoint, QueryItemsProvider, RelativeURLStringProvider
 {
     /// `"products"`.
     var relativeURLString: String { return "products" }
 
     /// The query items for this endpoint.
-    var queryItems: [NSURLQueryItem]
+    var queryItems: [URLQueryItem]
     {
         return baseQueryItems + filters.queryItems
     }
@@ -167,7 +166,7 @@ extension ProductsEndpoint: PageEndpointType, QueryItemsProviderType, RelativeUR
 
 extension ProductsEndpoint: DecodableEmbeddedArrayProcessingType
 {
-    typealias Input = AnyObject
+    typealias Input = Any
     typealias Output = [Embedded]
     typealias Error = NSError
     typealias Embedded = Product
@@ -183,21 +182,21 @@ struct SearchEndpoint
     let limit: Int
 }
 
-extension SearchEndpoint: PageEndpointType, QueryItemsProviderType, RelativeURLStringProviderType
+extension SearchEndpoint: PageEndpoint, QueryItemsProvider, RelativeURLStringProvider
 {
     /// `products`.
     var relativeURLString: String { return "products" }
 
     /// The query items for this endpoint.
-    var queryItems: [NSURLQueryItem]
+    var queryItems: [URLQueryItem]
     {
-        return baseQueryItems + [NSURLQueryItem(name: "q", value: query)]
+        return baseQueryItems + [URLQueryItem(name: "q", value: query)]
     }
 }
 
 extension SearchEndpoint: DecodableEmbeddedArrayProcessingType
 {
-    typealias Input = AnyObject
+    typealias Input = Any
     typealias Output = [Embedded]
     typealias Error = NSError
     typealias Embedded = Product
@@ -220,13 +219,13 @@ struct UsersEndpoint
     let limit: Int
 }
 
-extension UsersEndpoint: PageEndpointType, QueryItemsProviderType, RelativeURLStringProviderType
+extension UsersEndpoint: PageEndpoint, QueryItemsProvider, RelativeURLStringProvider
 {
     /// `"users"`.
     var relativeURLString: String { return "users" }
 
     /// The query items for this endpoint.
-    var queryItems: [NSURLQueryItem]
+    var queryItems: [URLQueryItem]
     {
         return baseQueryItems + order.queryItems
     }
@@ -234,7 +233,7 @@ extension UsersEndpoint: PageEndpointType, QueryItemsProviderType, RelativeURLSt
 
 extension UsersEndpoint: DecodableEmbeddedArrayProcessingType
 {
-    typealias Input = AnyObject
+    typealias Input = Any
     typealias Output = [Embedded]
     typealias Error = NSError
     typealias Embedded = User

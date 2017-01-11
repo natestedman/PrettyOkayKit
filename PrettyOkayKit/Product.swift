@@ -13,7 +13,7 @@
 // PERFORMANCE OF THIS SOFTWARE.
 
 import Foundation
-import ReactiveCocoa
+import ReactiveSwift
 
 // MARK: - Products
 
@@ -39,13 +39,13 @@ public struct Product: ModelType, Equatable
     // MARK: - Images
 
     /// A URL for an image of the product.
-    public let imageURL: NSURL?
+    public let imageURL: URL?
 
     /// A URL for a medium-sized image of the product.
-    public let mediumImageURL: NSURL?
+    public let mediumImageURL: URL?
 
     /// The URL for the original image URL, off of Very Goods.
-    public let originalImageURL: NSURL?
+    public let originalImageURL: URL?
     
     // MARK: - Source Store
 
@@ -53,10 +53,10 @@ public struct Product: ModelType, Equatable
     public let displayDomain: String?
 
     /// The domain name that the product was added from.
-    public let sourceDomain: NSURL?
+    public let sourceDomain: URL?
 
     /// The original source URL for the product.
-    public let sourceURL: NSURL?
+    public let sourceURL: URL?
 
     // MARK: - State
 
@@ -82,7 +82,7 @@ extension Product: Decoding
     /// - throws: An error encountered while decoding the `Product`.
     ///
     /// - returns: A `Product` value, if successful.
-    public init(encoded: [String : AnyObject]) throws
+    public init(encoded: [String : Any]) throws
     {
         try self.init(encoded: encoded, links: nil)
     }
@@ -95,14 +95,14 @@ extension Product: Decoding
     /// - throws: An error encountered while decoding the `Product`.
     ///
     /// - returns: A `Product` value, if successful.
-    public init(encoded: [String : AnyObject], links: [String : AnyObject]?) throws
+    public init(encoded: [String : Any], links: [String : Any]?) throws
     {
         // fall back on neutral gender if not parsed correctly, gendered items are silly anyways
         let genderString: String? = try? encoded.decode("gender")
         let gender = genderString.flatMap({ string in Gender(rawValue: string) }) ?? .Neutral
 
         // if this is a product associated with a `Good`, determine its deletion path
-        let linksToUse: [String:AnyObject]? = try? links ?? encoded.decode("_links")
+        let linksToUse: [String:Any]? = try? links ?? encoded.decode("_links")
         let goodDeletePath: String?? = try? linksToUse?.sub("good:delete").decode("href")
 
         self.init(
@@ -135,7 +135,7 @@ extension String
 /// - parameter rhs: The second product value.
 ///
 /// - returns: If the values are equal, `true`.
-@warn_unused_result
+
 public func ==(lhs: Product, rhs: Product) -> Bool
 {
     return lhs.identifier == rhs.identifier

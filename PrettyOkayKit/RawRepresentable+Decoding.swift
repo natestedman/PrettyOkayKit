@@ -12,8 +12,8 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-@warn_unused_result
-func decodeRaw<Decoded: RawRepresentable>(raw: Decoded.RawValue) throws -> Decoded
+
+func decodeRaw<Decoded: RawRepresentable>(_ raw: Decoded.RawValue) throws -> Decoded
 {
     if let value = Decoded(rawValue: raw)
     {

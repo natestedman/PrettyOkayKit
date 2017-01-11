@@ -14,7 +14,7 @@
 
 import ArrayLoader
 import Endpoint
-import ReactiveCocoa
+import ReactiveSwift
 import Shirley
 
 extension APIClient
@@ -24,10 +24,10 @@ extension APIClient
     /// A producer for a product's relations.
     ///
     /// - parameter identifier: The product identifier to load relations for.
-    public func productRelationsProducer(identifier identifier: ModelIdentifier)
+    public func productRelationsProducer(identifier: ModelIdentifier)
         -> SignalProducer<ProductRelations, NSError>
     {
-        return dataSession.producerForEndpoint(ProductRelationsEndpoint(productIdentifier: identifier))
+        return dataSession.endpointProducer(for: ProductRelationsEndpoint(productIdentifier: identifier))
     }
 }
 
@@ -41,20 +41,20 @@ extension APIClient
      - parameter limit:        The expected number of elements per page.
      - parameter makeEndpoint: A function to build an endpoint value.
      */
-    private func modelPageLoadStrategy
-        <Model: ModelType, Endpoint: BaseURLEndpointType where Endpoint: ProcessingType, Endpoint.Input == AnyObject, Endpoint.Output == [Model], Endpoint.Error == NSError>
-        (limit limit: Int, makeEndpoint: (LoadRequest<Model>, ModelPage) -> Endpoint)
-        -> StrategyArrayLoader<Model, NSError>.LoadStrategy
+    fileprivate func modelPageLoadStrategy
+        <Model: ModelType, Endpoint: BaseURLEndpoint>
+        (limit: Int, makeEndpoint: @escaping (LoadRequest<Model>, ModelPage) -> Endpoint)
+        -> StrategyArrayLoader<Model, NSError>.LoadStrategy where Endpoint: ProcessingType, Endpoint.Input == Any, Endpoint.Output == [Model], Endpoint.Error == NSError
     {
         return { request in
             switch ModelPage.pageForLoadRequest(request)
             {
-            case .Success(let page):
+            case .success(let page):
                 return self.endpointSession
-                    .producerForEndpoint(makeEndpoint(request, page))
-                    .loadResultProducerWithRequest(request, limit: limit)
+                    .baseURLEndpointProducer(for: makeEndpoint(request, page))
+                    .loadResultProducer(request: request, limit: limit)
 
-            case .Failure(let error):
+            case .failure(let error):
                 return SignalProducer(error: error)
             }
         }
@@ -66,23 +66,23 @@ extension APIClient
      - parameter limit:        The expected number of elements per page.
      - parameter makeEndpoint: A function to build an endpoint value.
      */
-    private func offsetPageLoadStrategy
-        <Model: ModelType, Endpoint: BaseURLEndpointType where Endpoint: ProcessingType, Endpoint.Input == AnyObject, Endpoint.Output == [Model], Endpoint.Error == NSError>
-        (limit limit: Int, makeEndpoint: (LoadRequest<Model>, OffsetPage) -> Endpoint)
-        -> StrategyArrayLoader<Model, NSError>.LoadStrategy
+    fileprivate func offsetPageLoadStrategy
+        <Model: ModelType, Endpoint: BaseURLEndpoint>
+        (limit: Int, makeEndpoint: @escaping (LoadRequest<Model>, OffsetPage) -> Endpoint)
+        -> StrategyArrayLoader<Model, NSError>.LoadStrategy where Endpoint: ProcessingType, Endpoint.Input == Any, Endpoint.Output == [Model], Endpoint.Error == NSError
     {
         return { request in
             let page: OffsetPage
 
             switch request
             {
-            case .Next(let current):
+            case .next(let current):
                 page = OffsetPage(skip: current.count)
 
-            case .Previous(let current):
+            case .previous(let current):
                 if current.count == 0
                 {
-                    return SignalProducer(error: APIClientLoadingError.FirstPageNotLoaded.NSError)
+                    return SignalProducer(error: APIClientLoadingError.firstPageNotLoaded as NSError)
                 }
                 else
                 {
@@ -91,8 +91,8 @@ extension APIClient
             }
 
             return self.endpointSession
-                .producerForEndpoint(makeEndpoint(request, page))
-                .loadResultProducerWithRequest(request, limit: limit)
+                .baseURLEndpointProducer(for: makeEndpoint(request, page))
+                .loadResultProducer(request: request, limit: limit)
         }
     }
 
@@ -105,7 +105,7 @@ extension APIClient
      - parameter filters:   The filters to apply.
      - parameter limit:     The number of goods to fetch per page.
      */
-    public func goodsLoadStrategy(username username: String, filters: Filters, limit: Int)
+    public func goodsLoadStrategy(username: String, filters: Filters, limit: Int)
         -> StrategyArrayLoader<Good, NSError>.LoadStrategy
     {
         return modelPageLoadStrategy(limit: limit, makeEndpoint: { request, page in
@@ -119,7 +119,7 @@ extension APIClient
      - parameter filters: The filters to use.
      - parameter limit:   The number of products to fetch per page.
      */
-    public func productsLoadStrategy(filters filters: Filters, limit: Int)
+    public func productsLoadStrategy(filters: Filters, limit: Int)
         -> StrategyArrayLoader<Product, NSError>.LoadStrategy
     {
         return modelPageLoadStrategy(limit: limit, makeEndpoint: { request, page in
@@ -133,7 +133,7 @@ extension APIClient
      - parameter order: The order in which users should be loaded.
      - parameter limit: The number of users to fetch per page.
      */
-    public func usersLoadStrategy(order order: Order, limit: Int) -> StrategyArrayLoader<User, NSError>.LoadStrategy
+    public func usersLoadStrategy(order: Order, limit: Int) -> StrategyArrayLoader<User, NSError>.LoadStrategy
     {
         return offsetPageLoadStrategy(limit: limit, makeEndpoint: { request, page in
             UsersEndpoint(order: order, page: page, limit: limit)
@@ -146,7 +146,7 @@ extension APIClient
      - parameter query: The query.
      - parameter limit: The number of products to fetch per page.
      */
-    public func searchArrayLoader(query query: String, limit: Int) -> AnyArrayLoader<Product, NSError>
+    public func searchArrayLoader(query: String, limit: Int) -> AnyArrayLoader<Product, NSError>
     {
         let loader = InfoStrategyArrayLoader<Product, Int, NSError>(
             nextInfo: 1,
@@ -155,11 +155,11 @@ extension APIClient
                 let page = IndexPage(index: request.info)
                 let endpoint = SearchEndpoint(query: query, page: page, limit: limit)
 
-                return self.endpointSession.producerForEndpoint(endpoint).map({ products in
+                return self.endpointSession.baseURLEndpointProducer(for: endpoint).map({ products in
                     InfoLoadResult(
                         elements: products,
-                        nextPageHasMore: products.count == limit ? .DoNotReplace : .Replace(false),
-                        nextPageInfo: .Replace(page.index + 1)
+                        nextPageHasMore: products.count == limit ? .doNotReplace : .replace(false),
+                        nextPageInfo: .replace(page.index + 1)
                     )
                 })
             }
@@ -170,14 +170,14 @@ extension APIClient
 }
 
 // MARK: - ArrayType
-private protocol ArrayType
+fileprivate protocol ArrayProtocol
 {
     associatedtype Element
     var array: [Element] { get }
     var count: Int { get }
 }
 
-extension Array: ArrayType
+extension Array: ArrayProtocol
 {
     var array: [Element]
     {
@@ -186,16 +186,16 @@ extension Array: ArrayType
 }
 
 // MARK: - SignalProducer Extension
-extension SignalProducerType where Value: ArrayType
+extension SignalProducerProtocol where Value: ArrayProtocol
 {
-    private func loadResultProducerWithRequest(request: LoadRequest<Value.Element>, limit: Int)
+    fileprivate func loadResultProducer(request: LoadRequest<Value.Element>, limit: Int)
         -> SignalProducer<LoadResult<Value.Element>, Error>
     {
         return map({ elements in
             LoadResult(
                 elements: elements.array,
-                nextPageHasMore: (request.isNext && elements.count < limit) ? .Replace(false) : .DoNotReplace,
-                previousPageHasMore: .DoNotReplace
+                nextPageHasMore: (request.isNext && elements.count < limit) ? .replace(false) : .doNotReplace,
+                previousPageHasMore: .doNotReplace
             )
         })
     }

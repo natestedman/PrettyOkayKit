@@ -14,21 +14,20 @@
 
 import ArrayLoader
 import Foundation
-import NSErrorRepresentable
-import ReactiveCocoa
+import ReactiveSwift
 
 // MARK: - API Client Loading Errors
 
 /// Errors that may occur when an API client load strategy has been used incorrectly.
-public enum APIClientLoadingError: Int, ErrorType
+public enum APIClientLoadingError: Int, Error
 {
     // MARK: - Errors
 
     /// The first page has not been loaded yet.
-    case FirstPageNotLoaded
+    case firstPageNotLoaded
 }
 
-extension APIClientLoadingError: NSErrorConvertible
+extension APIClientLoadingError: CustomNSError
 {
     // MARK: - Domain
 

@@ -12,12 +12,11 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-import NSErrorRepresentable
 
 // MARK: - Decoding Errors
 
 /// An error raised when a key is missing while decoding a model.
-public struct DecodeKeyError: ErrorType
+public struct DecodeKeyError: Error
 {
     // MARK: - Key
 
@@ -25,30 +24,30 @@ public struct DecodeKeyError: ErrorType
     public let key: String
 }
 
-extension DecodeKeyError: NSErrorConvertible
+extension DecodeKeyError: CustomNSError
 {
     // MARK: - Error
 
     /// The error domain.
-    public static var domain: String { return "PrettyOkayKit.DecodeKeyError" }
+    public static var errorDomain: String { return "PrettyOkayKit.DecodeKeyError" }
 
     /// The error code, which is always `0`.
-    public var code: Int { return 0 }
+    public var errorCode: Int { return 0 }
 }
 
-extension DecodeKeyError: UserInfoConvertible
+extension DecodeKeyError: LocalizedError
 {
     // MARK: - User Info
 
     /// A description of the error.
-    public var localizedDescription: String?
+    public var errorDescription: String?
     {
         return "Could not decode key “\(key)”"
     }
 }
 
 /// An error raised when a key is missing while decoding a model.
-public struct DecodeRawError<Raw>: ErrorType
+public struct DecodeRawError<Raw>: Error
 {
     // MARK: - Raw Value
 
@@ -56,30 +55,30 @@ public struct DecodeRawError<Raw>: ErrorType
     public let raw: Raw
 }
 
-extension DecodeRawError: NSErrorConvertible
+extension DecodeRawError: CustomNSError
 {
     // MARK: - Error
 
     /// The error domain.
-    public static var domain: String { return "PrettyOkayKit.DecodeRawError" }
+    public static var errorDomain: String { return "PrettyOkayKit.DecodeRawError" }
 
     /// The error code, which is always `0`.
-    public var code: Int { return 0 }
+    public var errorCode: Int { return 0 }
 }
 
-extension DecodeRawError: UserInfoConvertible
+extension DecodeRawError: LocalizedError
 {
     // MARK: - User Info
 
     /// A description of the error.
-    public var localizedDescription: String?
+    public var errorDescription: String?
     {
         return "Could not decode raw value “\(raw)”"
     }
 }
 
 /// An error raised when a decoded URL string is invalid.
-public struct InvalidURLError: ErrorType
+public struct InvalidURLError: Error
 {
     // MARK: - Properties
 
@@ -90,23 +89,23 @@ public struct InvalidURLError: ErrorType
     public let key: String
 }
 
-extension InvalidURLError: NSErrorConvertible
+extension InvalidURLError: CustomNSError
 {
     // MARK: - Error
 
     /// The error domain.
-    public static var domain: String { return "PrettyOkayKit.InvalidURLError" }
+    public static var errorDomain: String { return "PrettyOkayKit.InvalidURLError" }
 
     /// The error code, which is always `0`.
-    public var code: Int { return 0 }
+    public var errorCode: Int { return 0 }
 }
 
-extension InvalidURLError: UserInfoConvertible
+extension InvalidURLError: LocalizedError
 {
     // MARK: - User Info
 
     /// A description of the error.
-    public var localizedDescription: String?
+    public var errorDescription: String?
     {
         return "Could not decode URL string “\(URLString)” for key “\(key)”"
     }

@@ -48,7 +48,7 @@ public struct ProductRelations: Equatable
 /// - parameter rhs: The second product relations value.
 ///
 /// - returns: If the values are equal, `true`.
-@warn_unused_result
+
 public func ==(lhs: ProductRelations, rhs: ProductRelations) -> Bool
 {
     return lhs.relatedProducts == rhs.relatedProducts && lhs.users == rhs.users

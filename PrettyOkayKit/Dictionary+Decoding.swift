@@ -16,8 +16,7 @@ import Foundation
 
 extension Dictionary
 {
-    @warn_unused_result
-    func decode<Decoded>(key: Key) throws -> Decoded
+    func decode<Decoded>(_ key: Key) throws -> Decoded
     {
         if let value = self[key] as? Decoded
         {
@@ -29,12 +28,11 @@ extension Dictionary
         }
     }
 
-    @warn_unused_result
-    func decodeURL(key: Key) throws -> NSURL
+    func decodeURL(_ key: Key) throws -> URL
     {
         let URLString: String = try decode(key)
 
-        if let URL = NSURL(string: URLString) where URL.scheme == "http" || URL.scheme == "https"
+        if let URL = URL(string: URLString), URL.scheme == "http" || URL.scheme == "https"
         {
             return URL
         }
@@ -44,8 +42,7 @@ extension Dictionary
         }
     }
 
-    @warn_unused_result
-    func sub(key: Key) throws -> Dictionary
+    func sub(_ key: Key) throws -> Dictionary
     {
         return try decode(key)
     }

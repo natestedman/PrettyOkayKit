@@ -24,9 +24,9 @@ struct IndexPage
 
 extension IndexPage: QueryItemsRepresentable
 {
-    var queryItems: [NSURLQueryItem]
+    var queryItems: [URLQueryItem]
     {
-        return [NSURLQueryItem(name: "page", value: String(index))]
+        return [URLQueryItem(name: "page", value: String(index))]
     }
 }
 
@@ -38,13 +38,13 @@ enum ModelPage
     // MARK: - Pages
 
     /// The first page.
-    case First
+    case first
 
     /// The page after a model.
-    case After(ModelType)
+    case after(ModelType)
 
     /// The page before a model.
-    case Before(ModelType)
+    case before(ModelType)
 }
 
 extension ModelPage
@@ -56,27 +56,27 @@ extension ModelPage
 
      - parameter request: The load request.
      */
-    static func pageForLoadRequest<Model: ModelType>(request: LoadRequest<Model>) -> Result<ModelPage, NSError>
+    static func pageForLoadRequest<Model: ModelType>(_ request: LoadRequest<Model>) -> Result<ModelPage, NSError>
     {
         switch request
         {
-        case .Next(let current):
+        case .next(let current):
             if let last = current.last
             {
-                return .Success(.After(last))
+                return .success(.after(last))
             }
             else
             {
-                return .Success(.First)
+                return .success(.first)
             }
-        case .Previous(let current):
+        case .previous(let current):
             if let first = current.first
             {
-                return .Success(.Before(first))
+                return .success(.before(first))
             }
             else
             {
-                return .Failure(APIClientLoadingError.FirstPageNotLoaded.NSError)
+                return .failure(APIClientLoadingError.firstPageNotLoaded as NSError)
             }
         }
     }
@@ -87,16 +87,16 @@ extension ModelPage: QueryItemsRepresentable
     // MARK: - Query Items
 
     /// The query items required to load the page.
-    var queryItems: [NSURLQueryItem]
+    var queryItems: [URLQueryItem]
     {
         switch self
         {
-        case .First:
+        case .first:
             return []
-        case .After(let model):
-            return [NSURLQueryItem(name: "max_id", value: "\(model.identifier)")]
-        case .Before(let model):
-            return [NSURLQueryItem(name: "since_id", value: "\(model.identifier)")]
+        case .after(let model):
+            return [URLQueryItem(name: "max_id", value: "\(model.identifier)")]
+        case .before(let model):
+            return [URLQueryItem(name: "since_id", value: "\(model.identifier)")]
         }
     }
 }
@@ -110,9 +110,9 @@ struct OffsetPage
 
 extension OffsetPage: QueryItemsRepresentable
 {
-    var queryItems: [NSURLQueryItem]
+    var queryItems: [URLQueryItem]
     {
-        return [NSURLQueryItem(name: "skip", value: "\(skip)")]
+        return [URLQueryItem(name: "skip", value: "\(skip)")]
     }
 }
 
@@ -130,8 +130,8 @@ public enum Order: String
 
 extension Order: QueryItemsRepresentable
 {
-    var queryItems: [NSURLQueryItem]
+    var queryItems: [URLQueryItem]
     {
-        return [NSURLQueryItem(name: "order", value: rawValue)]
+        return [URLQueryItem(name: "order", value: rawValue)]
     }
 }

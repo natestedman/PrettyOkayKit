@@ -77,7 +77,7 @@ extension Filters
 /// - parameter rhs: The second filters value.
 ///
 /// - returns: If the values are equal, `true`.
-@warn_unused_result
+
 public func ==(lhs: Filters, rhs: Filters) -> Bool
 {
     return lhs.category == rhs.category && lhs.gender == rhs.gender && lhs.price == rhs.price
@@ -92,9 +92,9 @@ extension Filters: Decoding, Encoding
     /// - parameter encoded: An encoded dictionary representation.
     ///
     /// - throws: Errors encountered during decoding.
-    public init(encoded: [String : AnyObject]) throws
+    public init(encoded: [String : Any]) throws
     {
-        func decodeSet<Component: RawRepresentable>(input: [Component.RawValue]) throws -> Set<Component>
+        func decodeSet<Component: RawRepresentable>(_ input: [Component.RawValue]) throws -> Set<Component>
         {
             return try Set(input.map(decodeRaw))
         }
@@ -107,7 +107,7 @@ extension Filters: Decoding, Encoding
     }
 
     /// Encodes a `Filters` value to a dictionary representation.
-    public var encoded: [String : AnyObject]
+    public var encoded: [String : Any]
     {
         return [
             Filters.priceKey: price.map({ $0.rawValue }),
@@ -117,9 +117,9 @@ extension Filters: Decoding, Encoding
     }
 
     // MARK: - Coding Keys
-    private static let priceKey = "price"
-    private static let genderKey = "gender"
-    private static let categoryKey = "category"
+    fileprivate static let priceKey = "price"
+    fileprivate static let genderKey = "gender"
+    fileprivate static let categoryKey = "category"
 }
 
 extension Filters: QueryItemsRepresentable
@@ -127,19 +127,19 @@ extension Filters: QueryItemsRepresentable
     // MARK: - Query Items
 
     /// The query items to use when applying the filters to a URL request.
-    var queryItems: [NSURLQueryItem]
+    var queryItems: [URLQueryItem]
     {
         return Array([
             price.map({ price in
-                NSURLQueryItem(name: "price_category_id", value: "\(price.rawValue)")
+                URLQueryItem(name: "price_category_id", value: "\(price.rawValue)")
             }),
             gender.map({ gender in
-                NSURLQueryItem(name: "gender", value: gender.rawValue)
+                URLQueryItem(name: "gender", value: gender.rawValue)
             }),
             category.map({ category in
-                NSURLQueryItem(name: "category", value: category.rawValue)
+                URLQueryItem(name: "category", value: category.rawValue)
             })
-        ].flatten())
+        ].joined())
     }
 }
 
@@ -157,14 +157,14 @@ public protocol FilterComponent: Hashable
     static var all: [Self] { get }
 }
 
-extension SequenceType where Generator.Element: FilterComponent
+extension Sequence where Iterator.Element: FilterComponent
 {
     /// Simplifies the set of components - if all components are in the set, it can be replaced with an
     /// empty set for the same effect.
-    func simplifiedSet() -> Set<Generator.Element>
+    func simplifiedSet() -> Set<Iterator.Element>
     {
         let selfSet = Set(self)
-        return selfSet == Set(Generator.Element.all) ? [] : selfSet
+        return selfSet == Set(Iterator.Element.all) ? [] : selfSet
     }
 }
 
@@ -176,25 +176,25 @@ public enum Price: Int
     // MARK: - Items
 
     /// $1 to $25.
-    case From1To25 = 1
+    case from1To25 = 1
 
     /// $25 to $50.
-    case From25To50 = 2
+    case from25To50 = 2
 
     /// $50 to $100.
-    case From50To100 = 3
+    case from50To100 = 3
 
     /// $100 to $500.
-    case From100To500 = 4
+    case from100To500 = 4
 
     /// $500 to $1000.
-    case From500To1000 = 5
+    case from500To1000 = 5
 
     /// $1000 to $5000.
-    case From1000To5000 = 6
+    case from1000To5000 = 6
 
     /// $5000 or more.
-    case From5000Up = 7
+    case from5000Up = 7
 }
 
 extension Price: CustomStringConvertible
@@ -204,19 +204,19 @@ extension Price: CustomStringConvertible
     {
         switch self
         {
-        case .From1To25:
+        case .from1To25:
             return "$1-25"
-        case .From25To50:
+        case .from25To50:
             return "$25-50"
-        case .From50To100:
+        case .from50To100:
             return "$50-100"
-        case .From100To500:
+        case .from100To500:
             return "$100-500"
-        case .From500To1000:
+        case .from500To1000:
             return "$500-1000"
-        case .From1000To5000:
+        case .from1000To5000:
             return "$1000-5000"
-        case .From5000Up:
+        case .from5000Up:
             return "$5000+"
         }
     }
@@ -232,7 +232,7 @@ extension Price: FilterComponent
     /// All available price filters.
     public static var all: [Price]
     {
-        return [.From1To25, .From25To50, .From50To100, .From100To500, .From500To1000, .From1000To5000, .From5000Up]
+        return [.from1To25, .from25To50, .from50To100, .from100To500, .from500To1000, .from1000To5000, .from5000Up]
     }
 }
 

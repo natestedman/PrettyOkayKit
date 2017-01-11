@@ -26,7 +26,7 @@ public protocol AuthenticationType
     /// - parameter username: The username associated with the session.
     /// - parameter token:    The authentication cookie.
     /// - parameter session:  The session cookie.
-    init(username: String, token: NSHTTPCookie, session: NSHTTPCookie)
+    init(username: String, token: HTTPCookie, session: HTTPCookie)
 
     // MARK: - Properties
 
@@ -34,10 +34,10 @@ public protocol AuthenticationType
     var username: String { get }
 
     /// The authentication cookie.
-    var token: NSHTTPCookie { get }
+    var token: HTTPCookie { get }
 
     /// The session cookie.
-    var session: NSHTTPCookie { get }
+    var session: HTTPCookie { get }
 }
 
 /// An authenticated session on Very Goods.
@@ -50,7 +50,7 @@ public struct Authentication: Equatable, AuthenticationType
     /// - parameter username: The username associated with the session.
     /// - parameter token:    The authentication cookie.
     /// - parameter session:  The session cookie.
-    public init(username: String, token: NSHTTPCookie, session: NSHTTPCookie)
+    public init(username: String, token: HTTPCookie, session: HTTPCookie)
     {
         self.username = username
         self.token = token
@@ -63,10 +63,10 @@ public struct Authentication: Equatable, AuthenticationType
     public let username: String
 
     /// The authentication cookie.
-    public let token: NSHTTPCookie
+    public let token: HTTPCookie
 
     /// The session cookie
-    public let session: NSHTTPCookie
+    public let session: HTTPCookie
 }
 
 extension Authentication
@@ -78,11 +78,11 @@ extension Authentication
 
      - parameter URLRequest: The URL request.
      */
-    public func applyToMutableURLRequest(URLRequest: NSMutableURLRequest)
+    public func apply(to urlRequest: inout URLRequest)
     {
-        for (header, value) in NSHTTPCookie.requestHeaderFieldsWithCookies([token, session])
+        for (header, value) in HTTPCookie.requestHeaderFields(with: [token, session])
         {
-            URLRequest.setValue(value, forHTTPHeaderField: header)
+            urlRequest.setValue(value, forHTTPHeaderField: header)
         }
     }
 }
@@ -95,7 +95,7 @@ extension Authentication
 /// - parameter rhs: The second authentication value.
 ///
 /// - returns: If the values are equal, `true`.
-@warn_unused_result
+
 public func ==(lhs: Authentication, rhs: Authentication) -> Bool
 {
     return lhs.token.isEqual(rhs.token) && lhs.session.isEqual(rhs.token)
@@ -111,13 +111,13 @@ extension Authentication: Decoding, Encoding
     /// - throws: Errors encounted while decoding.
     ///
     /// - returns: A decoded authentication value.
-    public init(encoded: [String : AnyObject]) throws
+    public init(encoded: [String : Any]) throws
     {
-        guard let token = NSHTTPCookie(properties: try encoded.decode("token")) else {
+        guard let token = HTTPCookie(properties: try encoded.decode("token")) else {
             throw DecodeKeyError(key: "token")
         }
 
-        guard let session = NSHTTPCookie(properties: try encoded.decode("session")) else {
+        guard let session = HTTPCookie(properties: try encoded.decode("session")) else {
             throw DecodeKeyError(key: "session")
         }
 
@@ -125,7 +125,7 @@ extension Authentication: Decoding, Encoding
     }
 
     /// Encodes the authentication value.
-    public var encoded: [String : AnyObject]
+    public var encoded: [String : Any]
     {
         return [
             "username": username,

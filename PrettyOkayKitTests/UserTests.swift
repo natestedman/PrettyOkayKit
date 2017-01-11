@@ -19,7 +19,7 @@ final class UserTests: XCTestCase
 {
     func testDecodeNullOptionals()
     {
-        let encoded: [String:AnyObject] = [
+        let encoded: [String:Any] = [
             "_links":[
                 "password_reset":[
                     "href":"/account/password-reset?user_id=1"
@@ -70,7 +70,7 @@ final class UserTests: XCTestCase
 
     func testDecodeNonNullOptionals()
     {
-        let encoded: [String:AnyObject] = [
+        let encoded: [String:Any] = [
             "_links":[
                 "password_reset":[
                     "href":"/account/password-reset?user_id=1"
@@ -109,12 +109,12 @@ final class UserTests: XCTestCase
             username: "test", name: "Test",
             biography: "Test Bio",
             location: "Test Location",
-            URL: NSURL(string: "http://test.com")!,
-            avatarURL: NSURL(string: "http://test.com/avatar")!,
-            avatarURLCentered126: NSURL(string: "http://test.com/avatar_126")!,
-            coverURL: NSURL(string: "http://test.com/cover")!,
-            coverLargeURL: NSURL(string: "http://test.com/cover_big")!,
-            coverThumbURL: NSURL(string: "http://test.com/cover_thumb")!,
+            URL: URL(string: "http://test.com")!,
+            avatarURL: URL(string: "http://test.com/avatar")!,
+            avatarURLCentered126: URL(string: "http://test.com/avatar_126")!,
+            coverURL: URL(string: "http://test.com/cover")!,
+            coverLargeURL: URL(string: "http://test.com/cover_big")!,
+            coverThumbURL: URL(string: "http://test.com/cover_thumb")!,
             goodsCount: 100
         ))
     }

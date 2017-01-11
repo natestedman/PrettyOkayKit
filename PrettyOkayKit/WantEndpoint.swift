@@ -19,7 +19,7 @@ import Result
 // MARK: - Wanting
 
 /// An endpoint for wanting a product.
-internal struct WantEndpoint: CSRFTokenEndpointType
+internal struct WantEndpoint: CSRFTokenEndpoint
 {
     // MARK: - Initialization
 
@@ -49,30 +49,30 @@ internal struct WantEndpoint: CSRFTokenEndpointType
 
 extension WantEndpoint: Encoding
 {
-    var encoded: [String : AnyObject]
+    var encoded: [String : Any]
     {
         return ["product_id": identifier]
     }
 }
 
-extension WantEndpoint: BaseURLEndpointType,
-                        BodyProviderType,
-                        HeaderFieldsProviderType,
-                        MethodProviderType,
-                        RelativeURLStringProviderType
+extension WantEndpoint: BaseURLEndpoint,
+                        BodyProvider,
+                        HeaderFieldsProvider,
+                        HTTPMethodProvider,
+                        RelativeURLStringProvider
 {
-    var method: Endpoint.Method { return .Post }
+    var httpMethod: HTTPMethod { return .post }
     var relativeURLString: String { return "users/\(username.pathEscaped)/goods" }
 }
 
 extension WantEndpoint: ProcessingType
 {
-    func resultForInput(input: AnyObject) -> Result<String?, NSError>
+    func resultForInput(_ input: Any) -> Result<String?, NSError>
     {
-        return .Success(
-            (input as? [String:AnyObject])
-                .flatMap({ $0["_links"] as? [String:AnyObject] })
-                .flatMap({ $0["self"] as? [String:AnyObject] })
+        return .success(
+            (input as? [String:Any])
+                .flatMap({ $0["_links"] as? [String:Any] })
+                .flatMap({ $0["self"] as? [String:Any] })
                 .flatMap({ $0["href"] as? String })
                 .map({ $0.removeLeadingCharacter })
         )
@@ -82,7 +82,7 @@ extension WantEndpoint: ProcessingType
 // MARK: - Unwanting
 
 /// An endpoint for unwanting a product.
-internal struct UnwantEndpoint: CSRFTokenEndpointType
+internal struct UnwantEndpoint: CSRFTokenEndpoint
 {
     // MARK: - Initialization
 
@@ -105,37 +105,37 @@ internal struct UnwantEndpoint: CSRFTokenEndpointType
     let CSRFToken: String
 }
 
-extension UnwantEndpoint: BaseURLEndpointType,
-                          HeaderFieldsProviderType,
-                          MethodProviderType,
-                          RelativeURLStringProviderType
+extension UnwantEndpoint: BaseURLEndpoint,
+                          HeaderFieldsProvider,
+                          HTTPMethodProvider,
+                          RelativeURLStringProvider
 {
-    var method: Endpoint.Method { return .Delete }
+    var httpMethod: HTTPMethod { return .delete }
     var relativeURLString: String { return goodDeletePath }
     var headerFields: [String : String] { return ["Csrf-Token": CSRFToken] }
 }
 
 extension UnwantEndpoint: ProcessingType
 {
-    func resultForInput(input: AnyObject) -> Result<String?, NSError>
+    func resultForInput(_ input: Any) -> Result<String?, NSError>
     {
-        return .Success(nil)
+        return .success(nil)
     }
 }
 
 /// A protocol for endpoints that require a CSRF token.
-protocol CSRFTokenEndpointType
+protocol CSRFTokenEndpoint
 {
     /// The CSRF token.
     var CSRFToken: String { get }
 }
 
 // MARK: - Encodable Endpoint Extension
-extension Encoding where Self: BodyProviderType, Self: HeaderFieldsProviderType, Self: CSRFTokenEndpointType
+extension Encoding where Self: BodyProvider, Self: HeaderFieldsProvider, Self: CSRFTokenEndpoint
 {
-    var body: BodyType?
+    var body: HTTPBody?
     {
-        return try? NSJSONSerialization.dataWithJSONObject(encoded, options: [])
+        return try? JSONSerialization.data(withJSONObject: encoded, options: [])
     }
 
     var headerFields: [String: String]

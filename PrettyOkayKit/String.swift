@@ -18,6 +18,6 @@ extension String
 {
     var pathEscaped: String
     {
-        return stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLPathAllowedCharacterSet())!
+        return addingPercentEncoding(withAllowedCharacters: CharacterSet.urlPathAllowed)!
     }
 }

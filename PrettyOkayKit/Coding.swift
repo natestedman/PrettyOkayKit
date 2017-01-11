@@ -19,7 +19,7 @@ public protocol Decoding
     ///
     /// - Parameter encoded: The dictionary representation.
     /// - Throws: An error encountered while decoding.
-    init(encoded: [String:AnyObject]) throws
+    init(encoded: [String:Any]) throws
 }
 
 extension Decoding
@@ -30,7 +30,7 @@ extension Decoding
     /// - Throws: `DecodeKeyError` with key `Any`, or an error encountered while decoding.
     public init(anyEncoded: Any?) throws
     {
-        if let encoded = anyEncoded as? [String:AnyObject]
+        if let encoded = anyEncoded as? [String:Any]
         {
             try self.init(encoded: encoded)
         }
@@ -45,5 +45,5 @@ extension Decoding
 public protocol Encoding
 {
     /// A dictionary representation of the value.
-    var encoded: [String:AnyObject] { get }
+    var encoded: [String:Any] { get }
 }

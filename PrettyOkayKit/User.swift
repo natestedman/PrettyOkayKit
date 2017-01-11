@@ -39,26 +39,26 @@ public struct User: ModelType, Equatable
     public let location: String?
 
     /// The user's personal website URL.
-    public let URL: NSURL?
+    public let URL: Foundation.URL?
     
     // MARK: - Avatar
 
     /// The URL for the user's avatar.
-    public let avatarURL: NSURL?
+    public let avatarURL: Foundation.URL?
 
     /// The URL for the centered 126-pixel version of the user's avatar.
-    public let avatarURLCentered126: NSURL?
+    public let avatarURLCentered126: Foundation.URL?
     
     // MARK: - Cover
 
     /// The URL for the user's cover image.
-    public let coverURL: NSURL?
+    public let coverURL: Foundation.URL?
 
     /// The URL for the large version of the user's cover image.
-    public let coverLargeURL: NSURL?
+    public let coverLargeURL: Foundation.URL?
 
     /// The URL for the thumbnail version of the user's cover image.
-    public let coverThumbURL: NSURL?
+    public let coverThumbURL: Foundation.URL?
     
     // MARK: - Goods
 
@@ -77,7 +77,7 @@ extension User: Decoding
     /// - throws: An error encountered while decoding the `User`.
     ///
     /// - returns: A `User` value, if successful.
-    public init(encoded: [String : AnyObject]) throws
+    public init(encoded: [String : Any]) throws
     {
         self.init(
             identifier: try encoded.decode("id"),
@@ -110,7 +110,7 @@ extension User: CustomStringConvertible
 /// - parameter rhs: The second user value.
 ///
 /// - returns: If the values are equal, `true`.
-@warn_unused_result
+
 public func ==(lhs: User, rhs: User) -> Bool
 {
     return lhs.identifier == rhs.identifier

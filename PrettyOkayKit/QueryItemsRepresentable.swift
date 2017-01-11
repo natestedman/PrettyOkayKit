@@ -18,5 +18,5 @@ import Foundation
 protocol QueryItemsRepresentable
 {
     /// The query items for this value.
-    var queryItems: [NSURLQueryItem] { get }
+    var queryItems: [URLQueryItem] { get }
 }

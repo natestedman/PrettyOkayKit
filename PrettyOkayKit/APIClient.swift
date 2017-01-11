@@ -13,7 +13,7 @@
 // PERFORMANCE OF THIS SOFTWARE.
 
 import Endpoint
-import ReactiveCocoa
+import ReactiveSwift
 import Shirley
 import enum Result.NoError
 
@@ -30,38 +30,40 @@ public final class APIClient
         self.authentication = authentication
 
         // session setup
-        let dataSession = URLSession.HTTPSession().mapRequests({ (request: NSURLRequest) in
-            let mutable = (request as? NSMutableURLRequest) ?? request.mutableCopy() as! NSMutableURLRequest
-            authentication?.applyToMutableURLRequest(mutable)
+        let dataSession = URLSession.httpResponse.mapRequests({ (request: URLRequest) in
+            var mutable = request
+            authentication?.apply(to: &mutable)
             return mutable
         })
 
         let loggingSession = Session { request in
-            dataSession.producerForRequest(request)
+            dataSession.producer(for: request)
                 .on(started: { print("Sending \(request.logDescription)") })
-                .on(next: { print("Response \($0.response.statusCode) \(request.URL!.absoluteString)") })
+                .on(value: { print("Response \($0.response.statusCode) \(request.url!.absoluteString)") })
         }.raiseHTTPErrors { response, data in
-            let str = NSString(data: data, encoding: NSUTF8StringEncoding) ?? "invalid"
+            let str = NSString(data: data, encoding: String.Encoding.utf8.rawValue) ?? "invalid" as NSString
             return ["Response String": str]
         }
 
         self.dataSession = loggingSession
-        self.endpointSession = loggingSession.JSONSession().bodySession().mapRequests({ endpoint in
-            endpoint.requestWithBaseURL(NSURL(string: "https://verygoods.co/site-api-0.1/")!)!
+        self.endpointSession = loggingSession.json().body.mapRequests({ (endpoint: AnyBaseURLEndpoint) in
+            endpoint.request(baseURL: URL(string: "https://verygoods.co/site-api-0.1/")!)!
         })
 
         // CSRF setup
         let CSRFSession = loggingSession.mapRequests({ (endpoint: AnyEndpoint) in endpoint.request! })
 
-        CSRFToken = AnyProperty(
-            initialValue: nil,
-            producer: authentication.map({ authentication in
+        CSRFToken = Property(
+            initial: nil,
+            then: authentication.map({ authentication in
                 SignalProducer(value: ())
-                .concat(timer(3600, onScheduler: QueueScheduler.mainQueueScheduler).map({ _ in () }))
+                .concat(timer(interval: .seconds(3600), on: QueueScheduler.main).map({ _ in () }))
 
                 // request a CSRF token
-                .flatMap(.Latest, transform: { _ -> SignalProducer<String, NoError> in
-                    CSRFSession.outputProducerForRequest(CSRFEndpoint(purpose: .Authenticated(authentication)))
+                .flatMap(.latest, transform: { _ -> SignalProducer<String, NoError> in
+                    let output = loggingSession.endpointProducer(for: CSRFEndpoint(purpose: .authenticated(authentication)))
+
+                    return output
                         .map({ $0.token })
                         .flatMapError({ _ in SignalProducer.empty })
                 })
@@ -73,13 +75,13 @@ public final class APIClient
     // MARK: - Sessions
 
     /// The backing session for derived sessions.
-    let URLSession = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
+    let URLSession = Foundation.URLSession(configuration: URLSessionConfiguration.default)
 
     /// A session for loading data.
-    let dataSession: Session<NSURLRequest, Message<NSHTTPURLResponse, NSData>, NSError>
+    let dataSession: Session<URLRequest, Message<HTTPURLResponse, Data>, NSError>
 
     /// A session for using endpoint values to load JSON objects.
-    let endpointSession: Session<AnyBaseURLEndpoint, AnyObject, NSError>
+    let endpointSession: Session<AnyBaseURLEndpoint, Any, NSError>
 
     // MARK: - Authentication
 
@@ -90,20 +92,20 @@ public final class APIClient
 
     /// Destructive actions against the Very Goods API require a CSRF token. If authenticated, the client will
     /// automatically obtain one periodically, and place it in this property.
-    let CSRFToken: AnyProperty<String?>
+    let CSRFToken: Property<String?>
 }
 
-extension NSURLRequest
+extension URLRequest
 {
-    private var logDescription: String
+    fileprivate var logDescription: String
     {
         if let headers = allHTTPHeaderFields
         {
-            return "\(HTTPMethod!) \(URL!.absoluteString) \(headers)"
+            return "\(httpMethod!) \(url!.absoluteString) \(headers)"
         }
         else
         {
-            return "\(HTTPMethod!) \(URL!.absoluteString)"
+            return "\(httpMethod!) \(url!.absoluteString)"
         }
     }
 }

@@ -17,7 +17,7 @@ import XCTest
 
 final class ProductTests: XCTestCase
 {
-    private func encoded(links links: [String:AnyObject]) -> [String:AnyObject]
+    fileprivate func encoded(links: [String:Any]) -> [String:Any]
     {
         return [
             "_links": links,
@@ -58,7 +58,7 @@ final class ProductTests: XCTestCase
         ]
     }
 
-    private let linksNoDelete: [String:AnyObject] = [
+    fileprivate let linksNoDelete: [String:Any] = [
         "good:add": [
             "href": "/users/test/goods"
         ],
@@ -67,7 +67,7 @@ final class ProductTests: XCTestCase
         ]
     ]
 
-    private let linksWithDelete: [String:AnyObject] = [
+    fileprivate let linksWithDelete: [String:Any] = [
         "good:delete": [
             "href": "/test/path"
         ],
@@ -85,12 +85,12 @@ final class ProductTests: XCTestCase
             title: "Test",
             formattedPrice: "$25-$50",
             gender: .Male,
-            imageURL: NSURL(string: "https://test.com/image"),
-            mediumImageURL: NSURL(string: "https://test.com/image_medium"),
-            originalImageURL: NSURL(string: "https://test.com/image_orig"),
+            imageURL: URL(string: "https://test.com/image"),
+            mediumImageURL: URL(string: "https://test.com/image_medium"),
+            originalImageURL: URL(string: "https://test.com/image_orig"),
             displayDomain: "test.com",
-            sourceDomain: NSURL(string: "https://test.com"),
-            sourceURL: NSURL(string: "https://test.com/product"),
+            sourceDomain: URL(string: "https://test.com"),
+            sourceURL: URL(string: "https://test.com/product"),
             goodDeletePath: nil
         ))
     }
@@ -104,12 +104,12 @@ final class ProductTests: XCTestCase
             title: "Test",
             formattedPrice: "$25-$50",
             gender: .Male,
-            imageURL: NSURL(string: "https://test.com/image"),
-            mediumImageURL: NSURL(string: "https://test.com/image_medium"),
-            originalImageURL: NSURL(string: "https://test.com/image_orig"),
+            imageURL: URL(string: "https://test.com/image"),
+            mediumImageURL: URL(string: "https://test.com/image_medium"),
+            originalImageURL: URL(string: "https://test.com/image_orig"),
             displayDomain: "test.com",
-            sourceDomain: NSURL(string: "https://test.com"),
-            sourceURL: NSURL(string: "https://test.com/product"),
+            sourceDomain: URL(string: "https://test.com"),
+            sourceURL: URL(string: "https://test.com/product"),
             goodDeletePath: "test/path"
         ))
     }
@@ -123,12 +123,12 @@ final class ProductTests: XCTestCase
             title: "Test",
             formattedPrice: "$25-$50",
             gender: .Male,
-            imageURL: NSURL(string: "https://test.com/image"),
-            mediumImageURL: NSURL(string: "https://test.com/image_medium"),
-            originalImageURL: NSURL(string: "https://test.com/image_orig"),
+            imageURL: URL(string: "https://test.com/image"),
+            mediumImageURL: URL(string: "https://test.com/image_medium"),
+            originalImageURL: URL(string: "https://test.com/image_orig"),
             displayDomain: "test.com",
-            sourceDomain: NSURL(string: "https://test.com"),
-            sourceURL: NSURL(string: "https://test.com/product"),
+            sourceDomain: URL(string: "https://test.com"),
+            sourceURL: URL(string: "https://test.com/product"),
             goodDeletePath: nil
         ))
     }
@@ -142,12 +142,12 @@ final class ProductTests: XCTestCase
             title: "Test",
             formattedPrice: "$25-$50",
             gender: .Male,
-            imageURL: NSURL(string: "https://test.com/image"),
-            mediumImageURL: NSURL(string: "https://test.com/image_medium"),
-            originalImageURL: NSURL(string: "https://test.com/image_orig"),
+            imageURL: URL(string: "https://test.com/image"),
+            mediumImageURL: URL(string: "https://test.com/image_medium"),
+            originalImageURL: URL(string: "https://test.com/image_orig"),
             displayDomain: "test.com",
-            sourceDomain: NSURL(string: "https://test.com"),
-            sourceURL: NSURL(string: "https://test.com/product"),
+            sourceDomain: URL(string: "https://test.com"),
+            sourceURL: URL(string: "https://test.com/product"),
             goodDeletePath: "test/path"
         ))
     }

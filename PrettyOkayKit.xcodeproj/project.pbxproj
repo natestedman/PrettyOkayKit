@@ -10,17 +10,16 @@
 		43076F3E1DC3ECA700D9B5B2 /* ArrayLoader.framework in Copy Carthage Frameworks */ = {isa = PBXBuildFile; fileRef = 43076F361DC3ECA300D9B5B2 /* ArrayLoader.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		43076F401DC3ECA700D9B5B2 /* Endpoint.framework in Copy Carthage Frameworks */ = {isa = PBXBuildFile; fileRef = 43076F381DC3ECA300D9B5B2 /* Endpoint.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		43076F411DC3ECA700D9B5B2 /* HTMLReader.framework in Copy Carthage Frameworks */ = {isa = PBXBuildFile; fileRef = 43076F391DC3ECA300D9B5B2 /* HTMLReader.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		43076F421DC3ECA700D9B5B2 /* NSErrorRepresentable.framework in Copy Carthage Frameworks */ = {isa = PBXBuildFile; fileRef = 43076F3A1DC3ECA300D9B5B2 /* NSErrorRepresentable.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		43076F431DC3ECA700D9B5B2 /* ReactiveCocoa.framework in Copy Carthage Frameworks */ = {isa = PBXBuildFile; fileRef = 43076F3B1DC3ECA300D9B5B2 /* ReactiveCocoa.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		43076F441DC3ECA700D9B5B2 /* Result.framework in Copy Carthage Frameworks */ = {isa = PBXBuildFile; fileRef = 43076F3C1DC3ECA300D9B5B2 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		43076F451DC3ECA700D9B5B2 /* Shirley.framework in Copy Carthage Frameworks */ = {isa = PBXBuildFile; fileRef = 43076F3D1DC3ECA300D9B5B2 /* Shirley.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		43193C4F1E31B9F5009B26E7 /* ReactiveSwift.framework in Copy Carthage Frameworks */ = {isa = PBXBuildFile; fileRef = 43193C4E1E31B9F5009B26E7 /* ReactiveSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		432A33131CB9466100C877ED /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432A33101CB9466100C877ED /* Authentication.swift */; };
 		432A33141CB9466100C877ED /* AuthenticationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432A33111CB9466100C877ED /* AuthenticationController.swift */; };
 		432A33151CB9466100C877ED /* AuthenticationEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432A33121CB9466100C877ED /* AuthenticationEndpoints.swift */; };
 		432A33171CB9468500C877ED /* NoRedirectsSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432A33161CB9468500C877ED /* NoRedirectsSession.swift */; };
 		432A331C1CB946B700C877ED /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432A33191CB946B700C877ED /* APIClient.swift */; };
 		432A331D1CB946B700C877ED /* Endpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432A331A1CB946B700C877ED /* Endpoints.swift */; };
-		432A331E1CB946B700C877ED /* SessionType+Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432A331B1CB946B700C877ED /* SessionType+Endpoint.swift */; };
+		432A331E1CB946B700C877ED /* SessionProtocol+Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432A331B1CB946B700C877ED /* SessionProtocol+Endpoint.swift */; };
 		432A33201CB9667100C877ED /* APIClientLoadingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432A331F1CB9667100C877ED /* APIClientLoadingError.swift */; };
 		4338C0B81DC24CCE00B89314 /* APIClient+Loading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4338C0B71DC24CCD00B89314 /* APIClient+Loading.swift */; };
 		4339E1C81DF130DE00D57249 /* Dictionary+Decoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4339E1C71DF130DE00D57249 /* Dictionary+Decoding.swift */; };
@@ -67,8 +66,7 @@
 				43076F3E1DC3ECA700D9B5B2 /* ArrayLoader.framework in Copy Carthage Frameworks */,
 				43076F401DC3ECA700D9B5B2 /* Endpoint.framework in Copy Carthage Frameworks */,
 				43076F411DC3ECA700D9B5B2 /* HTMLReader.framework in Copy Carthage Frameworks */,
-				43076F421DC3ECA700D9B5B2 /* NSErrorRepresentable.framework in Copy Carthage Frameworks */,
-				43076F431DC3ECA700D9B5B2 /* ReactiveCocoa.framework in Copy Carthage Frameworks */,
+				43193C4F1E31B9F5009B26E7 /* ReactiveSwift.framework in Copy Carthage Frameworks */,
 				43076F441DC3ECA700D9B5B2 /* Result.framework in Copy Carthage Frameworks */,
 				43076F451DC3ECA700D9B5B2 /* Shirley.framework in Copy Carthage Frameworks */,
 			);
@@ -81,17 +79,16 @@
 		43076F361DC3ECA300D9B5B2 /* ArrayLoader.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ArrayLoader.framework; path = Carthage/Build/iOS/ArrayLoader.framework; sourceTree = "<group>"; };
 		43076F381DC3ECA300D9B5B2 /* Endpoint.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Endpoint.framework; path = Carthage/Build/iOS/Endpoint.framework; sourceTree = "<group>"; };
 		43076F391DC3ECA300D9B5B2 /* HTMLReader.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HTMLReader.framework; path = Carthage/Build/iOS/HTMLReader.framework; sourceTree = "<group>"; };
-		43076F3A1DC3ECA300D9B5B2 /* NSErrorRepresentable.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NSErrorRepresentable.framework; path = Carthage/Build/iOS/NSErrorRepresentable.framework; sourceTree = "<group>"; };
-		43076F3B1DC3ECA300D9B5B2 /* ReactiveCocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReactiveCocoa.framework; path = Carthage/Build/iOS/ReactiveCocoa.framework; sourceTree = "<group>"; };
 		43076F3C1DC3ECA300D9B5B2 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Result.framework; path = Carthage/Build/iOS/Result.framework; sourceTree = "<group>"; };
 		43076F3D1DC3ECA300D9B5B2 /* Shirley.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Shirley.framework; path = Carthage/Build/iOS/Shirley.framework; sourceTree = "<group>"; };
+		43193C4E1E31B9F5009B26E7 /* ReactiveSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReactiveSwift.framework; path = Carthage/Build/iOS/ReactiveSwift.framework; sourceTree = "<group>"; };
 		432A33101CB9466100C877ED /* Authentication.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
 		432A33111CB9466100C877ED /* AuthenticationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationController.swift; sourceTree = "<group>"; };
 		432A33121CB9466100C877ED /* AuthenticationEndpoints.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationEndpoints.swift; sourceTree = "<group>"; };
 		432A33161CB9468500C877ED /* NoRedirectsSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoRedirectsSession.swift; sourceTree = "<group>"; };
 		432A33191CB946B700C877ED /* APIClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		432A331A1CB946B700C877ED /* Endpoints.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Endpoints.swift; sourceTree = "<group>"; };
-		432A331B1CB946B700C877ED /* SessionType+Endpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SessionType+Endpoint.swift"; sourceTree = "<group>"; };
+		432A331B1CB946B700C877ED /* SessionProtocol+Endpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SessionProtocol+Endpoint.swift"; sourceTree = "<group>"; };
 		432A331F1CB9667100C877ED /* APIClientLoadingError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIClientLoadingError.swift; sourceTree = "<group>"; };
 		4338C0B71DC24CCD00B89314 /* APIClient+Loading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "APIClient+Loading.swift"; sourceTree = "<group>"; };
 		4339E1C71DF130DE00D57249 /* Dictionary+Decoding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Dictionary+Decoding.swift"; sourceTree = "<group>"; };
@@ -171,7 +168,7 @@
 			isa = PBXGroup;
 			children = (
 				432A33161CB9468500C877ED /* NoRedirectsSession.swift */,
-				432A331B1CB946B700C877ED /* SessionType+Endpoint.swift */,
+				432A331B1CB946B700C877ED /* SessionProtocol+Endpoint.swift */,
 			);
 			name = Sessions;
 			sourceTree = "<group>";
@@ -193,8 +190,7 @@
 				43076F361DC3ECA300D9B5B2 /* ArrayLoader.framework */,
 				43076F381DC3ECA300D9B5B2 /* Endpoint.framework */,
 				43076F391DC3ECA300D9B5B2 /* HTMLReader.framework */,
-				43076F3A1DC3ECA300D9B5B2 /* NSErrorRepresentable.framework */,
-				43076F3B1DC3ECA300D9B5B2 /* ReactiveCocoa.framework */,
+				43193C4E1E31B9F5009B26E7 /* ReactiveSwift.framework */,
 				43076F3C1DC3ECA300D9B5B2 /* Result.framework */,
 				43076F3D1DC3ECA300D9B5B2 /* Shirley.framework */,
 			);
@@ -330,7 +326,7 @@
 				TargetAttributes = {
 					43A8DB041C6AA23D007D4CF7 = {
 						CreatedOnToolsVersion = 7.3;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 0810;
 					};
 					43A8DB0E1C6AA23D007D4CF7 = {
 						CreatedOnToolsVersion = 7.3;
@@ -402,7 +398,7 @@
 				432A33131CB9466100C877ED /* Authentication.swift in Sources */,
 				432A33201CB9667100C877ED /* APIClientLoadingError.swift in Sources */,
 				437B54B51DB2997900449478 /* WantState.swift in Sources */,
-				432A331E1CB946B700C877ED /* SessionType+Endpoint.swift in Sources */,
+				432A331E1CB946B700C877ED /* SessionProtocol+Endpoint.swift in Sources */,
 				4339E1C81DF130DE00D57249 /* Dictionary+Decoding.swift in Sources */,
 				432A331C1CB946B700C877ED /* APIClient.swift in Sources */,
 			);
@@ -539,7 +535,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.natestedman.PrettyOkayKit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -558,7 +554,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.natestedman.PrettyOkayKit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -569,7 +565,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.natestedman.PrettyOkayKitTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -580,7 +576,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.natestedman.PrettyOkayKitTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

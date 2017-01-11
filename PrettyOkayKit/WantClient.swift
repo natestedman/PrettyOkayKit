@@ -12,8 +12,7 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-import NSErrorRepresentable
-import ReactiveCocoa
+import ReactiveSwift
 import enum Result.NoError
 
 // MARK: - Client
@@ -34,15 +33,15 @@ public final class WantClient
     // MARK: - Storage
 
     /// The API client backing the want client.
-    private let API: APIClient
+    fileprivate let API: APIClient
 
     /// The current states of the want client.
-    private let states = MutableProperty<[ModelIdentifier:WantClientState]>([:])
+    fileprivate let states = MutableProperty<[ModelIdentifier:WantClientState]>([:])
 
     // MARK: - Change Notifications
 
     /// A backing pipe for `changedSignal`.
-    private let changedPipe = Signal<(), NoError>.pipe()
+    fileprivate let changedPipe = Signal<(), NoError>.pipe()
 
     /// A signal that sends a value whenever a want is changed on the server.
     public var changedSignal: Signal<(), NoError> { return changedPipe.0 }
@@ -56,29 +55,16 @@ extension WantClient
     ///
     /// - parameter identifier:     The product identifier to use.
     /// - parameter goodDeletePath: If the product is wanted, the path to delete its `Good`.
-    public func initialize(identifier identifier: Int, goodDeletePath: String?)
+    public func initialize(identifier: Int, goodDeletePath: String?)
     {
         states.modify({ current in
-            if let clientState = current[identifier]
+            if let clientState = current[identifier], clientState.goodDeletePath != nil, goodDeletePath == nil
             {
-                switch clientState
-                {
-                case .Wanted:
-                    return goodDeletePath == nil
-                        ? with(current) { $0.removeValueForKey(identifier) }
-                        : current
-
-                case .Modifying:
-                    return current
-                }
+                current.removeValue(forKey: identifier)
             }
             else if let path = goodDeletePath
             {
-                return with(current) { $0[identifier] = .Wanted(goodDeletePath: path) }
-            }
-            else
-            {
-                return current
+                current[identifier] = .wanted(goodDeletePath: path)
             }
         })
     }
@@ -92,7 +78,7 @@ extension WantClient
     ///
     /// - parameter identifier: The product identifier.
     /// - parameter want:       The desired want state.
-    public func modify(identifier identifier: Int, want: Bool)
+    public func modify(identifier: Int, want: Bool)
     {
         guard let username = API.authentication?.username else { return }
         let session = API.endpointSession
@@ -100,49 +86,43 @@ extension WantClient
         // a producer to obtain the CSRF token for the request
         let CSRFTokenProducer = API.CSRFToken.producer
             .promoteErrors(NSError.self)
-            .ignoreNil()
-            .take(1)
-            .timeoutWithError(
-                WantClientError.CSRFTokenTimeout.NSError,
-                afterInterval: 10,
-                onScheduler: QueueScheduler.mainQueueScheduler
+            .skipNil()
+            .take(first: 1)
+            .timeout(
+                after: 10,
+                raising: WantClientError.csrfTokenTimeout as NSError,
+                on: QueueScheduler.main
             )
 
         // a producer to make the want or unwant request
         let requestProducer = CSRFTokenProducer
-            .zipWith(states.producer.promoteErrors(NSError.self))
-            .take(1)
-            .flatMap(.Concat, transform: { CSRFToken, states in
+            .zip(with: states.producer.promoteErrors(NSError.self))
+            .take(first: 1)
+            .flatMap(.concat, transform: { CSRFToken, states in
                 want
-                    ? session.producerForEndpoint(WantEndpoint(
+                    ? session.baseURLEndpointProducer(for: WantEndpoint(
                         username: username,
                         identifier: identifier,
                         CSRFToken: CSRFToken
                     ))
                     : (states[identifier]?.goodDeletePath).map({ goodDeletePath in
-                        session.producerForEndpoint(UnwantEndpoint(
+                        session.baseURLEndpointProducer(for: UnwantEndpoint(
                             goodDeletePath: goodDeletePath,
                             CSRFToken: CSRFToken
                         ))
-                    }) ?? SignalProducer(error: WantClientError.MissingGoodDeletePath.NSError)
+                    }) ?? SignalProducer(error: WantClientError.missingGoodDeletePath as NSError)
             })
-            .observeOn(QueueScheduler(qos: QOS_CLASS_USER_INITIATED, name: "WantClient"))
+            .observe(on: QueueScheduler(qos: .userInitiated, name: "WantClient"))
 
         // a producer that handles terminating events
         let completionProducer = requestProducer.on(
-            next: { [weak self] path in
-                self?.states.modify({ states in
-                    with(states) { $0[identifier] = path.map(WantClientState.Wanted) }
-                })
-
-                self?.changedPipe.1.sendNext()
-            },
             failed: { [weak self] error in
                 print("Error while modifying want state to \(want) for \(identifier): \(error)")
-
-                self?.states.modify({ states in
-                    with(states) { $0[identifier] = nil } // TODO: rollback unwant
-                })
+                self?.states.modify({ $0 [identifier] = nil }) // TODO: rollback unwant
+            },
+            value: { [weak self] path in
+                self?.states.modify({ $0[identifier] = path.map(WantClientState.wanted) })
+                self?.changedPipe.1.send(value: ())
             }
         )
 
@@ -151,40 +131,30 @@ extension WantClient
             {
                 switch clientState
                 {
-                case .Wanted:
-                    return with(states) {
-                        $0[identifier] = .Modifying(
-                            disposable: completionProducer.start(),
-                            want: want
-                        )
-                    }
+                case .wanted:
+                    states[identifier] = .modifying(
+                        disposable: completionProducer.start(),
+                        want: want
+                    )
 
-                case let .Modifying(disposable, modifyingWant):
-                    if want == modifyingWant
-                    {
-                        return states
-                    }
-                    else
+                case let .modifying(disposable, modifyingWant):
+                    if want != modifyingWant
                     {
                         disposable.dispose()
 
-                        return with(states) {
-                            $0[identifier] = .Modifying(
-                                disposable: completionProducer.start(),
-                                want: want
-                            )
-                        }
+                        states[identifier] = .modifying(
+                            disposable: completionProducer.start(),
+                            want: want
+                        )
                     }
                 }
             }
             else
             {
-                return with(states) {
-                    $0[identifier] = .Modifying(
-                        disposable: completionProducer.start(),
-                        want: want
-                    )
-                }
+                states[identifier] = .modifying(
+                    disposable: completionProducer.start(),
+                    want: want
+                )
             }
         })
     }
@@ -197,19 +167,18 @@ extension WantClient
     /// A signal producer for a specific product's want state.
     ///
     /// - parameter identifier: The product identifier to observe.
-    @warn_unused_result
-    public func wantStateProducer(identifier identifier: Int) -> SignalProducer<WantState, NoError>
+    public func wantStateProducer(identifier: Int) -> SignalProducer<WantState, NoError>
     {
         return states.producer.map({ states in
             states[identifier].map({ clientState in
                 switch clientState
                 {
-                case .Wanted:
+                case .wanted:
                     return .Wanted
-                case let .Modifying(_, want):
-                    return want ? .ModifyingToWanted : .ModifyingToNotWanted
+                case let .modifying(_, want):
+                    return want ? .modifyingToWanted : .modifyingToNotWanted
                 }
-            }) ?? .NotWanted
+            }) ?? .notWanted
         }).skipRepeats()
     }
 }
@@ -217,23 +186,23 @@ extension WantClient
 // MARK: - Want Client Errors
 
 /// Errors that may be raised by `WantClient`.
-public enum WantClientError: Int, ErrorType
+public enum WantClientError: Int, Error
 {
     // MARK: - Cases
 
     /// A CSRF token could not be obtained for the request.
-    case CSRFTokenTimeout
+    case csrfTokenTimeout
 
     /// There was no delete path for the product.
-    case MissingGoodDeletePath
+    case missingGoodDeletePath
 }
 
-extension WantClientError: NSErrorConvertible
+extension WantClientError: CustomNSError
 {
     // MARK: - NSError
 
     /// `PrettyOkayKit.WantClientError`
-    public static var domain: String { return "PrettyOkayKit.WantClientError" }
+    public static var errorDomain: String { return "PrettyOkayKit.WantClientError" }
 }
 
 /// Describes the state of an individual product, with respect to `WantClient`. A non-wanted state is omitted for
@@ -243,10 +212,10 @@ private enum WantClientState
     // MARK: - Cases
 
     /// The user wants the product.
-    case Wanted(goodDeletePath: String)
+    case wanted(goodDeletePath: String)
 
     /// The want state is being modified.
-    case Modifying(disposable: Disposable, want: Bool)
+    case modifying(disposable: Disposable, want: Bool)
 }
 
 extension WantClientState
@@ -258,18 +227,11 @@ extension WantClientState
     {
         switch self
         {
-        case let .Wanted(goodDeletePath):
+        case let .wanted(goodDeletePath):
             return goodDeletePath
 
-        case .Modifying:
+        case .modifying:
             return nil // TODO
         }
     }
-}
-
-internal func with<Value>(value: Value, _ transform: (inout Value) -> ()) -> Value
-{
-    var mutable = value
-    transform(&mutable)
-    return mutable
 }

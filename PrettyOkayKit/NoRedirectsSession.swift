@@ -13,43 +13,43 @@
 // PERFORMANCE OF THIS SOFTWARE.
 
 import Foundation
-import ReactiveCocoa
+import ReactiveSwift
 import Shirley
 
 /// A session that will not follow redirects.
 internal final class NoRedirectsSession
 {
     // MARK: - Initialization
-    init(configuration: NSURLSessionConfiguration)
+    init(configuration: URLSessionConfiguration)
     {
         let delegate = NoRedirectsURLSessionDelegate()
         self.delegate = delegate
-        self.session = NSURLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
+        self.session = URLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
     }
 
     // MARK: - Session and Delegate
-    private let session: NSURLSession
-    private let delegate: NoRedirectsURLSessionDelegate
+    fileprivate let session: URLSession
+    fileprivate let delegate: NoRedirectsURLSessionDelegate
 }
 
-extension NoRedirectsSession: SessionType
+extension NoRedirectsSession: SessionProtocol
 {
     // MARK: - Session Type
-    func producerForRequest(request: NSURLRequest) -> SignalProducer<Message<NSURLResponse, NSData>, NSError>
+    func producer(for request: URLRequest) -> SignalProducer<Message<URLResponse, Data>, NSError>
     {
-        return session.producerForRequest(request)
+        return session.producer(for: request)
     }
 }
 
 // MARK: - Session Delegate
-private final class NoRedirectsURLSessionDelegate: NSObject, NSURLSessionDelegate
+private final class NoRedirectsURLSessionDelegate: NSObject, URLSessionDelegate
 {
     @objc func URLSession(
-        session: NSURLSession,
-        task: NSURLSessionTask,
-        willPerformHTTPRedirection response: NSHTTPURLResponse,
-        newRequest request: NSURLRequest,
-        completionHandler: (NSURLRequest?) -> Void)
+        _ session: Foundation.URLSession,
+        task: URLSessionTask,
+        willPerformHTTPRedirection response: HTTPURLResponse,
+        newRequest request: URLRequest,
+        completionHandler: (URLRequest?) -> Void)
     {
         // do not follow redirects, we need the cookie values for authentication
         completionHandler(nil)

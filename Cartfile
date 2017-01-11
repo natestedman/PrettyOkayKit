@@ -1,5 +1,4 @@
-github "natestedman/ArrayLoader" ~> 0.3.0
-github "natestedman/Endpoint" ~> 0.2.0
-github "natestedman/NSErrorRepresentable" ~> 0.6.0
-github "natestedman/Shirley" ~> 0.7.1
+github "natestedman/ArrayLoader" "feature/swift3"
+github "natestedman/Endpoint" ~> 2.0
+github "natestedman/Shirley" ~> 1.0
 github "nolanw/HTMLReader" ~> 2.0

@@ -20,16 +20,16 @@ public enum WantState
     // MARK: - Cases
 
     /// The user does not want the product.
-    case NotWanted
+    case notWanted
 
     /// The user wants the product.
     case Wanted
 
     /// The client is modifying the product's want state to `NotWanted`.
-    case ModifyingToNotWanted
+    case modifyingToNotWanted
 
     /// The client is modifying the product's want state to `Wanted`.
-    case ModifyingToWanted
+    case modifyingToWanted
 }
 
 extension WantState
@@ -41,9 +41,9 @@ extension WantState
     {
         switch self
         {
-        case .Wanted, .ModifyingToWanted:
+        case .Wanted, .modifyingToWanted:
             return true
-        case .NotWanted, .ModifyingToNotWanted:
+        case .notWanted, .modifyingToNotWanted:
             return false
         }
     }
@@ -53,9 +53,9 @@ extension WantState
     {
         switch self
         {
-        case .ModifyingToWanted, .ModifyingToNotWanted:
+        case .modifyingToWanted, .modifyingToNotWanted:
             return true
-        case .Wanted, .NotWanted:
+        case .Wanted, .notWanted:
             return false
         }
     }

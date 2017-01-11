@@ -15,8 +15,7 @@
 import Endpoint
 import Foundation
 import HTMLReader
-import NSErrorRepresentable
-import ReactiveCocoa
+import ReactiveSwift
 import Result
 import Shirley
 
@@ -33,58 +32,56 @@ struct ProductRelationsEndpoint
     let productIdentifier: ModelIdentifier
 }
 
-extension ProductRelationsEndpoint: EndpointType, MethodProviderType, URLProviderType
+extension ProductRelationsEndpoint: Endpoint, HTTPMethodProvider, URLProvider
 {
     // MARK: - Endpoint
 
     /// `GET` is used.
-    var method: Endpoint.Method { return .Get }
+    var httpMethod: HTTPMethod { return .get }
 
     /// The Very Goods URL of the product.
-    var URL: NSURL? { return NSURL(string: "https://verygoods.co/product/\(productIdentifier)") }
+    var url: URL? { return Foundation.URL(string: "https://verygoods.co/product/\(productIdentifier)") }
 }
 
 extension ProductRelationsEndpoint: ProcessingType
 {
-    func resultForInput(input: Message<NSHTTPURLResponse, NSData>) -> Result<ProductRelations, NSError>
+    func resultForInput(_ input: Message<HTTPURLResponse, Data>) -> Result<ProductRelations, NSError>
     {
         let HTML = HTMLDocument(data: input.body, contentTypeHeader: nil)
 
         let headResult = Result(
-            HTML.rootElement?.childElementNodes.lazy.filter({ $0.tagName.lowercaseString == "head" }).first,
-            failWith: ProductRelationsError.FailedToFindHead.NSError
+            HTML.rootElement?.childElementNodes.lazy.filter({ $0.tagName.lowercased() == "head" }).first,
+            failWith: ProductRelationsError.failedToFindHead as NSError
         )
 
         let encodedResult = headResult.flatMap({ head in
             head.JSONResultWith(identifier: "related_products")
                 .flatMap({ any in
                     Result(
-                        any as? [[String:AnyObject]],
-                        failWith: ProductRelationsError.InvalidRelatedProductsJSONType.NSError
+                        any as? [[String:Any]],
+                        failWith: ProductRelationsError.invalidRelatedProductsJSONType as NSError
                     )
                 })
                 &&& head.JSONResultWith(identifier: "product")
                     .flatMap({ any in
                         Result(
-                            ((any as? [String:AnyObject])?["_embedded"] as? [String:AnyObject]),
-                            failWith: ProductRelationsError.InvalidProductJSONType.NSError
+                            ((any as? [String:Any])?["_embedded"] as? [String:Any]),
+                            failWith: ProductRelationsError.invalidProductJSONType as NSError
                         )
                     })
                     .flatMap({ dictionary in
                         Result(
-                            (dictionary["in_user_goods"] as? [String:AnyObject])?["users"] as? [[String:AnyObject]] ?? [],
-                            failWith: ProductRelationsError.CouldNotFindInUserGoods.NSError
+                            (dictionary["in_user_goods"] as? [String:Any])?["users"] as? [[String:Any]] ?? [],
+                            failWith: ProductRelationsError.couldNotFindInUserGoods as NSError
                         )
                     })
         })
 
         return encodedResult.flatMap({ encodedRelated, encodedUsers in
             Result(attempt: {
-                try rethrowNSError(
-                    ProductRelations(
-                        relatedProducts: try encodedRelated.map(Product.init),
-                        users: try encodedUsers.map(User.init)
-                    )
+                ProductRelations(
+                    relatedProducts: try encodedRelated.map(Product.init),
+                    users: try encodedUsers.map(User.init)
                 )
             })
         })
@@ -98,11 +95,11 @@ extension HTMLElement
 
      - parameter identifier: The identifier to search for
      */
-    private func JSONResultWith(identifier identifier: String) -> Result<AnyObject, NSError>
+    fileprivate func JSONResultWith(identifier: String) -> Result<Any, NSError>
     {
         return Result(
             scriptWith(identifier: identifier),
-            failWith: ProductRelationsError.FailedToFindScriptTag.NSError
+            failWith: ProductRelationsError.failedToFindScriptTag as NSError
         ).flatMap({ $0.JSONResult() })
     }
 
@@ -111,23 +108,23 @@ extension HTMLElement
 
      - parameter identifier: The identifier to search for.
      */
-    private func scriptWith(identifier identifier: String) -> HTMLElement?
+    fileprivate func scriptWith(identifier: String) -> HTMLElement?
     {
         return childElementNodes.lazy.filter({
-            $0.tagName.lowercaseString == "script" && $0.attributes["id"] == identifier
+            $0.tagName.lowercased() == "script" && $0.attributes["id"] == identifier
         }).first
     }
 
     /// A result for reinterpreting the element's inner HTML as JSON data.
-    private func JSONResult() -> Result<AnyObject, NSError>
+    fileprivate func JSONResult() -> Result<Any, NSError>
     {
         let dataResult = Result(
-            innerHTML.dataUsingEncoding(NSUTF8StringEncoding),
-            failWith: ProductRelationsError.CouldNotEncodeInnerHTML.NSError
+            innerHTML.data(using: .utf8),
+            failWith: ProductRelationsError.couldNotEncodeInnerHTML as NSError
         )
 
         return dataResult.flatMap({ data in
-            Result(attempt: { try NSJSONSerialization.JSONObjectWithData(data, options: []) })
+            Result(attempt: { try JSONSerialization.jsonObject(with: data, options: []) })
         })
     }
 }
@@ -135,33 +132,33 @@ extension HTMLElement
 // MARK: - Product Relations Errors
 
 /// Enumerates errors that may arise while loading product relations.
-public enum ProductRelationsError: Int, ErrorType
+public enum ProductRelationsError: Int, Error
 {
     // MARK: - Cases
 
     /// The `head` tag could not be found in the parsed HTML.
-    case FailedToFindHead
+    case failedToFindHead
 
     /// A script tag could not be found in the parsed HTML.
-    case FailedToFindScriptTag
+    case failedToFindScriptTag
 
     /// The inner HTML of a tag could not be encoded as data.
-    case CouldNotEncodeInnerHTML
+    case couldNotEncodeInnerHTML
 
     /// The related products JSON did not match the expected type.
-    case InvalidRelatedProductsJSONType
+    case invalidRelatedProductsJSONType
 
     /// The product JSON did not match the expected type.
-    case InvalidProductJSONType
+    case invalidProductJSONType
 
     /// The `in_user_goods` key could not be found in the product JSON.
-    case CouldNotFindInUserGoods
+    case couldNotFindInUserGoods
 }
 
-extension ProductRelationsError: NSErrorConvertible
+extension ProductRelationsError: LocalizedError
 {
     // MARK: - Error Convertible
 
     /// `PrettyOkayKit.ProductRelationsError`.
-    public static var domain: String { return "PrettyOkayKit.ProductRelationsError" }
+    public static var errorDomain: String { return "PrettyOkayKit.ProductRelationsError" }
 }

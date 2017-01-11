@@ -15,143 +15,142 @@
 import Endpoint
 import Foundation
 import HTMLReader
-import NSErrorRepresentable
 import Result
 import Shirley
 
 // MARK: - Purpose
 enum CSRFEndpointPurpose
 {
-    case Login
-    case Authenticated(Authentication)
+    case login
+    case authenticated(Authentication)
 }
 
 extension CSRFEndpointPurpose
 {
-    private var authentication: Authentication?
+    fileprivate var authentication: Authentication?
     {
         switch self
         {
-        case .Login:
+        case .login:
             return nil
-        case .Authenticated(let authentication):
+        case .authenticated(let authentication):
             return authentication
         }
     }
 
-    private var URLString: String
+    fileprivate var URLString: String
     {
         switch self
         {
-        case .Login:
+        case .login:
             return "https://verygoods.co/login"
-        case .Authenticated:
+        case .authenticated:
             return "https://verygoods.co/"
         }
     }
 
-    private var request: NSURLRequest?
+    fileprivate var request: URLRequest?
     {
-        return NSURL(string: URLString).map({ URL in
-            let request = NSMutableURLRequest(URL: URL)
-            request.HTTPShouldHandleCookies = false
-            request.cachePolicy = .ReloadIgnoringCacheData
-            authentication?.applyToMutableURLRequest(request)
+        return URL(string: URLString).map({ URL in
+            var request = URLRequest(url: URL)
+            request.httpShouldHandleCookies = false
+            request.cachePolicy = .reloadIgnoringCacheData
+            authentication?.apply(to: &request)
             return request
         })
     }
 }
 
 // MARK: - Endpoint
-struct CSRFEndpoint: EndpointType
+struct CSRFEndpoint: Endpoint
 {
     let purpose: CSRFEndpointPurpose
     
-    var request: NSURLRequest? { return purpose.request }
+    var request: URLRequest? { return purpose.request }
 }
 
 extension CSRFEndpoint: ProcessingType
 {
-    func resultForInput(message: Message<NSHTTPURLResponse, NSData>)
-        -> Result<(token: String, cookies: [NSHTTPCookie]), NSError>
+    func resultForInput(_ message: Message<HTTPURLResponse, Data>)
+        -> Result<(token: String, cookies: [HTTPCookie]), NSError>
     {
         // parse HTML for the CSRF token
         let HTML = HTMLDocument(data: message.body, contentTypeHeader: nil)
 
         guard let head = HTML.rootElement?.childElementNodes.lazy.filter({ element in
-            element.tagName.lowercaseString == "head"
+            element.tagName.lowercased() == "head"
         }).first
-        else { return .Failure(CSRFError.FailedToFindHead.NSError) }
+        else { return .failure(CSRFError.failedToFindHead as NSError) }
 
         guard let meta = head.childElementNodes.lazy.filter({ element in
-            element.tagName.lowercaseString == "meta" && element.attributes["name"] == "csrf-token"
+            element.tagName.lowercased() == "meta" && element.attributes["name"] == "csrf-token"
         }).first
-        else { return .Failure(CSRFError.FailedToFindMeta.NSError) }
+        else { return .failure(CSRFError.failedToFindMeta as NSError) }
 
         guard let csrf = meta.attributes["content"] else {
-            return .Failure(CSRFError.FailedToFindCSRF.NSError)
+            return .failure(CSRFError.failedToFindCSRF as NSError)
         }
 
         // extract response parameters
         guard let headers = message.response.allHeaderFields as? [String:String] else {
-            return .Failure(CSRFError.FailedToFindHeaders.NSError)
+            return .failure(CSRFError.failedToFindHeaders as NSError)
         }
 
-        guard let URL = message.response.URL else {
-            return .Failure(CSRFError.FailedToFindURL.NSError)
+        guard let URL = message.response.url else {
+            return .failure(CSRFError.failedToFindURL as NSError)
         }
 
         // create current cookies
-        let cookies = NSHTTPCookie.cookiesWithResponseHeaderFields(headers, forURL: URL)
-        return .Success((token: csrf, cookies: cookies))
+        let cookies = HTTPCookie.cookies(withResponseHeaderFields: headers, for: URL)
+        return .success((token: csrf, cookies: cookies))
     }
 }
 
 // MARK: - CSRF Errors
 
 /// The errors that may occur while finding a CSRF token.
-public enum CSRFError: Int, ErrorType
+public enum CSRFError: Int, Error
 {
     // MARK: - Errors
 
     /// The `<head>` tag could not be found in the response.
-    case FailedToFindHead
+    case failedToFindHead
 
     /// The required `<meta>` tag could not be found in the response.
-    case FailedToFindMeta
+    case failedToFindMeta
 
     /// The CSRF token could not be found in the response.
-    case FailedToFindCSRF
+    case failedToFindCSRF
 
     /// The headers could not be found in the response.
-    case FailedToFindHeaders
+    case failedToFindHeaders
 
     /// The URL could not be found in the response.
-    case FailedToFindURL
+    case failedToFindURL
 }
 
-extension CSRFError: NSErrorConvertible
+extension CSRFError: CustomNSError
 {
     // MARK: - Error Domain
 
     /// The error domain for `AuthenticationCSRFError` values.
-    public static var domain: String { return "PrettyOkay.AuthenticationCSRFError" }
+    public static var errorDomain: String { return "PrettyOkay.AuthenticationCSRFError" }
 }
 
-extension CSRFError: UserInfoConvertible
+extension CSRFError: LocalizedError
 {
     // MARK: - User Info
 
     /// A description of the error.
-    public var localizedDescription: String?
+    public var errorDescription: String?
     {
         switch self
         {
-        case FailedToFindHead: return "Failed to find “head” tag."
-        case FailedToFindMeta: return "Failed to find “meta” tag."
-        case FailedToFindCSRF: return "Failed to find CSRF token."
-        case FailedToFindHeaders: return "Failed to find headers."
-        case FailedToFindURL: return "Failed to find URL."
+        case .failedToFindHead: return "Failed to find “head” tag."
+        case .failedToFindMeta: return "Failed to find “meta” tag."
+        case .failedToFindCSRF: return "Failed to find CSRF token."
+        case .failedToFindHeaders: return "Failed to find headers."
+        case .failedToFindURL: return "Failed to find URL."
         }
     }
 }

@@ -42,7 +42,7 @@ extension Good: Decoding
     /// - throws: An error encountered while decoding the `Good`.
     ///
     /// - returns: A `Good` value, if successful.
-    public init(encoded: [String : AnyObject]) throws
+    public init(encoded: [String : Any]) throws
     {
         let embedded = try encoded.sub("_embedded")
         let links = try encoded.sub("_links")
@@ -69,7 +69,7 @@ extension Good: CustomStringConvertible
 /// - parameter rhs: The second good value.
 ///
 /// - returns: If the values are equal, `true`.
-@warn_unused_result
+
 public func ==(lhs: Good, rhs: Good) -> Bool
 {
     return lhs.identifier == rhs.identifier && lhs.product == rhs.product && lhs.owner == rhs.owner
