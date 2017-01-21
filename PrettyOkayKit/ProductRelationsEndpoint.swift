@@ -43,9 +43,9 @@ extension ProductRelationsEndpoint: Endpoint, HTTPMethodProvider, URLProvider
     var url: URL? { return Foundation.URL(string: "https://verygoods.co/product/\(productIdentifier)") }
 }
 
-extension ProductRelationsEndpoint: ProcessingType
+extension ProductRelationsEndpoint: ResultProcessing
 {
-    func resultForInput(_ input: Message<HTTPURLResponse, Data>) -> Result<ProductRelations, NSError>
+    func result(for input: Message<HTTPURLResponse, Data>) -> Result<ProductRelations, NSError>
     {
         let HTML = HTMLDocument(data: input.body, contentTypeHeader: nil)
 

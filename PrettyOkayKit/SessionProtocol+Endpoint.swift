@@ -22,10 +22,10 @@ extension SessionProtocol where Request == AnyBaseURLEndpoint
     // MARK: - Signal Producers
     func baseURLEndpointProducer<Endpoint: BaseURLEndpoint>(for endpoint: Endpoint)
         -> SignalProducer<Endpoint.Output, Error>
-        where Endpoint: ProcessingType, Endpoint.Input == Value, Endpoint.Error == Error
+        where Endpoint: ResultProcessing, Endpoint.Input == Value, Endpoint.Error == Error
     {
         return producer(for: AnyBaseURLEndpoint(endpoint)).flatMap(.concat, transform: { value in
-            SignalProducer(result: endpoint.resultForInput(value))
+            SignalProducer(result: endpoint.result(for: value))
         })
     }
 }
@@ -34,10 +34,10 @@ extension SessionProtocol where Request == URLRequest
 {
     func endpointProducer<EndpointValue: Endpoint>(for endpoint: EndpointValue)
         -> SignalProducer<EndpointValue.Output, Error>
-        where EndpointValue: ProcessingType, EndpointValue.Input == Value, EndpointValue.Error == Error
+        where EndpointValue: ResultProcessing, EndpointValue.Input == Value, EndpointValue.Error == Error
     {
         return producer(for: endpoint.request!).flatMap(.concat, transform: { value in
-            SignalProducer(result: endpoint.resultForInput(value))
+            SignalProducer(result: endpoint.result(for: value))
         })
     }
 }
@@ -52,7 +52,7 @@ extension SessionProtocol where Request == URLRequest
 //    /// - parameter endpoint: The endpoint.
 //    func outputProducer<EndpointValue: BaseURLEndpoint>(for endpoint: EndpointValue)
 //        -> SignalProducer<EndpointValue.Output, NSError>
-//        where EndpointValue: ProcessingType, EndpointValue.Input == AnyObject, EndpointValue.Error == Error
+//        where EndpointValue: ResultProcessing, EndpointValue.Input == AnyObject, EndpointValue.Error == Error
 //    {
 //        return producer(for: AnyBaseURLEndpoint(endpoint)).flatMap(.concat, transform: { JSON in
 //            SignalProducer(result: endpoint.resultForInput(JSON))
@@ -64,10 +64,10 @@ extension SessionProtocol where Request == AnyEndpoint
 {
     func outputProducer<EndpointValue: Endpoint>(for request: EndpointValue)
         -> SignalProducer<EndpointValue.Output, Error>
-        where EndpointValue: ProcessingType, EndpointValue.Input == Value, EndpointValue.Error == Error
+        where EndpointValue: ResultProcessing, EndpointValue.Input == Value, EndpointValue.Error == Error
     {
         return producer(for: AnyEndpoint(request)).flatMap(.concat, transform: { input in
-            SignalProducer(result: request.resultForInput(input))
+            SignalProducer(result: request.result(for: input))
         })
     }
 }

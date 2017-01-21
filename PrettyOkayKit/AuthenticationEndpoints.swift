@@ -61,9 +61,9 @@ extension AuthenticationEndpoint: Endpoint
     }
 }
 
-extension AuthenticationEndpoint: ProcessingType
+extension AuthenticationEndpoint: ResultProcessing
 {
-    func resultForInput(_ message: Message<HTTPURLResponse, Data>) -> Result<Authentication, NSError>
+    func result(for message: Message<HTTPURLResponse, Data>) -> Result<Authentication, NSError>
     {
         guard let headers = message.response.allHeaderFields as? [String:String] else {
             return .failure(AuthenticationError.invalidHeaders as NSError)

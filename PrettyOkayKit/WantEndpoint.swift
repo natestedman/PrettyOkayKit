@@ -65,9 +65,9 @@ extension WantEndpoint: BaseURLEndpoint,
     var relativeURLString: String { return "users/\(username.pathEscaped)/goods" }
 }
 
-extension WantEndpoint: ProcessingType
+extension WantEndpoint: ResultProcessing
 {
-    func resultForInput(_ input: Any) -> Result<String?, NSError>
+    func result(for input: Any) -> Result<String?, NSError>
     {
         return .success(
             (input as? [String:Any])
@@ -115,9 +115,9 @@ extension UnwantEndpoint: BaseURLEndpoint,
     var headerFields: [String : String] { return ["Csrf-Token": csrfToken] }
 }
 
-extension UnwantEndpoint: ProcessingType
+extension UnwantEndpoint: ResultProcessing
 {
-    func resultForInput(_ input: Any) -> Result<String?, NSError>
+    func result(for input: Any) -> Result<String?, NSError>
     {
         return .success(nil)
     }

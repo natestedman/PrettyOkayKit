@@ -18,33 +18,33 @@ import Foundation
 import Result
 
 // MARK: - Processing Type
-protocol ProcessingType
+protocol ResultProcessing
 {
     associatedtype Input
     associatedtype Output
     associatedtype Error: Swift.Error
 
-    func resultForInput(_ input: Input) -> Result<Output, Error>
+    func result(for input: Input) -> Result<Output, Error>
 }
 
-extension ProcessingType where Output == ()
+extension ResultProcessing where Output == ()
 {
-    func resultForInput(_ input: Input) -> Result<Output, Error>
+    func result(for input: Input) -> Result<Output, Error>
     {
         return .success(())
     }
 }
 
-protocol DecodableEmbeddedArrayProcessingType: ProcessingType
+protocol DecodableEmbeddedArrayResultProcessing: ResultProcessing
 {
     associatedtype Embedded: Decoding
 
     var embeddedKey: String { get }
 }
 
-extension DecodableEmbeddedArrayProcessingType where Input == Any, Output == [Embedded]
+extension DecodableEmbeddedArrayResultProcessing where Input == Any, Output == [Embedded]
 {
-    func resultForInput(_ input: Input) -> Result<Output, NSError>
+    func result(for input: Input) -> Result<Output, NSError>
     {
         guard let encoded = (input as? [String:Any])?["_embedded"] as? [String:Any] else {
             return .failure(DecodeKeyError(key: "_embedded") as NSError)
@@ -129,7 +129,7 @@ extension GoodsEndpoint: PageEndpoint, QueryItemsProvider, RelativeURLStringProv
     }
 }
 
-extension GoodsEndpoint: DecodableEmbeddedArrayProcessingType
+extension GoodsEndpoint: DecodableEmbeddedArrayResultProcessing
 {
     typealias Input = Any
     typealias Output = [Embedded]
@@ -164,7 +164,7 @@ extension ProductsEndpoint: PageEndpoint, QueryItemsProvider, RelativeURLStringP
     }
 }
 
-extension ProductsEndpoint: DecodableEmbeddedArrayProcessingType
+extension ProductsEndpoint: DecodableEmbeddedArrayResultProcessing
 {
     typealias Input = Any
     typealias Output = [Embedded]
@@ -194,7 +194,7 @@ extension SearchEndpoint: PageEndpoint, QueryItemsProvider, RelativeURLStringPro
     }
 }
 
-extension SearchEndpoint: DecodableEmbeddedArrayProcessingType
+extension SearchEndpoint: DecodableEmbeddedArrayResultProcessing
 {
     typealias Input = Any
     typealias Output = [Embedded]
@@ -231,7 +231,7 @@ extension UsersEndpoint: PageEndpoint, QueryItemsProvider, RelativeURLStringProv
     }
 }
 
-extension UsersEndpoint: DecodableEmbeddedArrayProcessingType
+extension UsersEndpoint: DecodableEmbeddedArrayResultProcessing
 {
     typealias Input = Any
     typealias Output = [Embedded]

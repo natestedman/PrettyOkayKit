@@ -69,9 +69,9 @@ struct CSRFEndpoint: Endpoint
     var request: URLRequest? { return purpose.request }
 }
 
-extension CSRFEndpoint: ProcessingType
+extension CSRFEndpoint: ResultProcessing
 {
-    func resultForInput(_ message: Message<HTTPURLResponse, Data>)
+    func result(for message: Message<HTTPURLResponse, Data>)
         -> Result<(token: String, cookies: [HTTPCookie]), NSError>
     {
         // parse HTML for the CSRF token

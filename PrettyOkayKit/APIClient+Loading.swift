@@ -44,7 +44,7 @@ extension APIClient
     fileprivate func modelPageLoadStrategy
         <Model: ModelType, Endpoint: BaseURLEndpoint>
         (limit: Int, makeEndpoint: @escaping (LoadRequest<Model>, ModelPage) -> Endpoint)
-        -> StrategyArrayLoader<Model, NSError>.LoadStrategy where Endpoint: ProcessingType, Endpoint.Input == Any, Endpoint.Output == [Model], Endpoint.Error == NSError
+        -> StrategyArrayLoader<Model, NSError>.LoadStrategy where Endpoint: ResultProcessing, Endpoint.Input == Any, Endpoint.Output == [Model], Endpoint.Error == NSError
     {
         return { request in
             switch ModelPage.pageForLoadRequest(request)
@@ -69,7 +69,7 @@ extension APIClient
     fileprivate func offsetPageLoadStrategy
         <Model: ModelType, Endpoint: BaseURLEndpoint>
         (limit: Int, makeEndpoint: @escaping (LoadRequest<Model>, OffsetPage) -> Endpoint)
-        -> StrategyArrayLoader<Model, NSError>.LoadStrategy where Endpoint: ProcessingType, Endpoint.Input == Any, Endpoint.Output == [Model], Endpoint.Error == NSError
+        -> StrategyArrayLoader<Model, NSError>.LoadStrategy where Endpoint: ResultProcessing, Endpoint.Input == Any, Endpoint.Output == [Model], Endpoint.Error == NSError
     {
         return { request in
             let page: OffsetPage
