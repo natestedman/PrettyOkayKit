@@ -89,7 +89,7 @@ extension WantClient
         let session = api.endpointSession
 
         // a producer to obtain the CSRF token for the request
-        let CSRFTokenProducer = api.CSRFToken.producer
+        let csrfTokenProducer = api.csrfToken.producer
             .promoteErrors(NSError.self)
             .skipNil()
             .take(first: 1)
@@ -100,20 +100,20 @@ extension WantClient
             )
 
         // a producer to make the want or unwant request
-        let requestProducer = CSRFTokenProducer
+        let requestProducer = csrfTokenProducer
             .zip(with: states.producer.promoteErrors(NSError.self))
             .take(first: 1)
-            .flatMap(.concat, transform: { CSRFToken, states in
+            .flatMap(.concat, transform: { csrfToken, states in
                 want
                     ? session.baseURLEndpointProducer(for: WantEndpoint(
                         username: username,
                         identifier: identifier,
-                        CSRFToken: CSRFToken
+                        csrfToken: csrfToken
                     ))
                     : (states[identifier]?.goodDeletePath).map({ goodDeletePath in
                         session.baseURLEndpointProducer(for: UnwantEndpoint(
                             goodDeletePath: goodDeletePath,
-                            CSRFToken: CSRFToken
+                            csrfToken: csrfToken
                         ))
                     }) ?? SignalProducer(error: WantClientError.missingGoodDeletePath as NSError)
             })

@@ -52,7 +52,7 @@ public final class APIClient
         })
 
         // CSRF setup
-        CSRFToken = Property(
+        csrfToken = Property(
             initial: nil,
             then: authentication.map({ authentication in
                 SignalProducer(value: ())
@@ -88,7 +88,7 @@ public final class APIClient
 
     /// Destructive actions against the Very Goods API require a CSRF token. If authenticated, the client will
     /// automatically obtain one periodically, and place it in this property.
-    let CSRFToken: Property<String?>
+    let csrfToken: Property<String?>
 }
 
 extension URLRequest

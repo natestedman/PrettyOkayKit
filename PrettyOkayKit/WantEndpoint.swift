@@ -28,11 +28,11 @@ internal struct WantEndpoint: CSRFTokenEndpoint
 
      - parameter identifier: The identifier of the product to want.
      */
-    init(username: String, identifier: ModelIdentifier, CSRFToken: String)
+    init(username: String, identifier: ModelIdentifier, csrfToken: String)
     {
         self.username = username
         self.identifier = identifier
-        self.CSRFToken = CSRFToken
+        self.csrfToken = csrfToken
     }
 
     // MARK: - Data
@@ -44,7 +44,7 @@ internal struct WantEndpoint: CSRFTokenEndpoint
     let identifier: ModelIdentifier
 
     /// The CSRF token for the request.
-    let CSRFToken: String
+    let csrfToken: String
 }
 
 extension WantEndpoint: Encoding
@@ -89,11 +89,11 @@ internal struct UnwantEndpoint: CSRFTokenEndpoint
     /// Initializes an unwant endpoint
     ///
     /// - parameter goodDeletePath: The URL path to use.
-    /// - parameter CSRFToken:      The CSRF token to use.
-    init(goodDeletePath: String, CSRFToken: String)
+    /// - parameter csrfToken:      The CSRF token to use.
+    init(goodDeletePath: String, csrfToken: String)
     {
         self.goodDeletePath = goodDeletePath
-        self.CSRFToken = CSRFToken
+        self.csrfToken = csrfToken
     }
 
     // MARK: - Data
@@ -102,7 +102,7 @@ internal struct UnwantEndpoint: CSRFTokenEndpoint
     let goodDeletePath: String
 
     /// A CSRF token.
-    let CSRFToken: String
+    let csrfToken: String
 }
 
 extension UnwantEndpoint: BaseURLEndpoint,
@@ -112,7 +112,7 @@ extension UnwantEndpoint: BaseURLEndpoint,
 {
     var httpMethod: HTTPMethod { return .delete }
     var relativeURLString: String { return goodDeletePath }
-    var headerFields: [String : String] { return ["Csrf-Token": CSRFToken] }
+    var headerFields: [String : String] { return ["Csrf-Token": csrfToken] }
 }
 
 extension UnwantEndpoint: ProcessingType
@@ -127,7 +127,7 @@ extension UnwantEndpoint: ProcessingType
 protocol CSRFTokenEndpoint
 {
     /// The CSRF token.
-    var CSRFToken: String { get }
+    var csrfToken: String { get }
 }
 
 // MARK: - Encodable Endpoint Extension
@@ -142,7 +142,7 @@ extension Encoding where Self: BodyProvider, Self: HeaderFieldsProvider, Self: C
     {
         return [
             "Content-Type": "application/json;charset=UTF-8",
-            "Csrf-Token": CSRFToken,
+            "Csrf-Token": csrfToken,
             "Origin": "https://verygoods.co",
             "X-Requested-With": "XMLHttpRequest",
             "Referer": "https://verygoods.co"
