@@ -42,24 +42,6 @@ extension SessionProtocol where Request == URLRequest
     }
 }
 
-///// `SessionProtocol` is extended to provide endpoint and load strategy support.
-//extension SessionProtocol where Request == AnyBaseURLEndpoint, Value == AnyObject, Error == NSError
-//{
-//    // MARK: - Endpoints
-//
-//    /// Creates a signal producer for the specified endpoint.
-//    ///
-//    /// - parameter endpoint: The endpoint.
-//    func outputProducer<EndpointValue: BaseURLEndpoint>(for endpoint: EndpointValue)
-//        -> SignalProducer<EndpointValue.Output, NSError>
-//        where EndpointValue: ResultProcessing, EndpointValue.Input == AnyObject, EndpointValue.Error == Error
-//    {
-//        return producer(for: AnyBaseURLEndpoint(endpoint)).flatMap(.concat, transform: { JSON in
-//            SignalProducer(result: endpoint.resultForInput(JSON))
-//        })
-//    }
-//}
-//
 extension SessionProtocol where Request == AnyEndpoint
 {
     func outputProducer<EndpointValue: Endpoint>(for request: EndpointValue)
