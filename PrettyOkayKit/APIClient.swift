@@ -25,7 +25,8 @@ public final class APIClient
     /// Initializes an API client.
     ///
     /// - parameter authentication: The authentication to use for the client.
-    public init(authentication: Authentication?)
+    /// - parameter log: A logging function for requests and errors.
+    public init(authentication: Authentication?, log: @escaping (String) -> () = { _ in })
     {
         self.authentication = authentication
 
@@ -38,8 +39,8 @@ public final class APIClient
 
         let loggingSession = Session { request in
             dataSession.producer(for: request)
-                .on(started: { print("Sending \(request.logDescription)") })
-                .on(value: { print("Response \($0.response.statusCode) \(request.url!.absoluteString)") })
+                .on(started: { log("Sending \(request.logDescription)") })
+                .on(value: { log("Response \($0.response.statusCode) \(request.url!.absoluteString)") })
         }.raiseHTTPErrors { response, data in
             let str = NSString(data: data, encoding: String.Encoding.utf8.rawValue) ?? "invalid" as NSString
             return ["Response String": str]

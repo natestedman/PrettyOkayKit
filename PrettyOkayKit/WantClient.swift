@@ -25,15 +25,20 @@ public final class WantClient
     /// Initializes a want client.
     ///
     /// - parameter API: The API client to make requests with.
-    public init(API: APIClient)
+    /// - parameter log: A logging function for errors.
+    public init(API: APIClient, log: @escaping (String) -> () = { _ in })
     {
         self.API = API
+        self.log = log
     }
 
     // MARK: - Storage
 
     /// The API client backing the want client.
     fileprivate let API: APIClient
+
+    /// A logging function.
+    fileprivate let log: (String) -> ()
 
     /// The current states of the want client.
     fileprivate let states = MutableProperty<[ModelIdentifier:WantClientState]>([:])
@@ -117,7 +122,7 @@ extension WantClient
         // a producer that handles terminating events
         let completionProducer = requestProducer.on(
             failed: { [weak self] error in
-                print("Error while modifying want state to \(want) for \(identifier): \(error)")
+                self?.log("Error while modifying want state to \(want) for \(identifier): \(error)")
                 self?.states.modify({ $0 [identifier] = nil }) // TODO: rollback unwant
             },
             value: { [weak self] path in
