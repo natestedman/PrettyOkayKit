@@ -24,18 +24,18 @@ public final class WantClient
 
     /// Initializes a want client.
     ///
-    /// - parameter API: The API client to make requests with.
+    /// - parameter api: The API client to make requests with.
     /// - parameter log: A logging function for errors.
-    public init(API: APIClient, log: @escaping (String) -> () = { _ in })
+    public init(api: APIClient, log: @escaping (String) -> () = { _ in })
     {
-        self.API = API
+        self.api = api
         self.log = log
     }
 
     // MARK: - Storage
 
     /// The API client backing the want client.
-    fileprivate let API: APIClient
+    fileprivate let api: APIClient
 
     /// A logging function.
     fileprivate let log: (String) -> ()
@@ -85,11 +85,11 @@ extension WantClient
     /// - parameter want:       The desired want state.
     public func modify(identifier: Int, want: Bool)
     {
-        guard let username = API.authentication?.username else { return }
-        let session = API.endpointSession
+        guard let username = api.authentication?.username else { return }
+        let session = api.endpointSession
 
         // a producer to obtain the CSRF token for the request
-        let CSRFTokenProducer = API.CSRFToken.producer
+        let CSRFTokenProducer = api.CSRFToken.producer
             .promoteErrors(NSError.self)
             .skipNil()
             .take(first: 1)
