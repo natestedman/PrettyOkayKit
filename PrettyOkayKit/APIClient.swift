@@ -31,7 +31,7 @@ public final class APIClient
         self.authentication = authentication
 
         // session setup
-        let dataSession = URLSession.httpResponse.mapRequests({ (request: URLRequest) in
+        let dataSession = urlSession.httpResponse.mapRequests({ (request: URLRequest) in
             var mutable = request
             authentication?.apply(to: &mutable)
             return mutable
@@ -71,7 +71,7 @@ public final class APIClient
     // MARK: - Sessions
 
     /// The backing session for derived sessions.
-    let URLSession = Foundation.URLSession(configuration: URLSessionConfiguration.default)
+    let urlSession = URLSession(configuration: URLSessionConfiguration.default)
 
     /// A session for loading data.
     let dataSession: Session<URLRequest, Message<HTTPURLResponse, Data>, NSError>
