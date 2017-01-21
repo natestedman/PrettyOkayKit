@@ -51,8 +51,6 @@ public final class APIClient
         })
 
         // CSRF setup
-        let CSRFSession = loggingSession.mapRequests({ (endpoint: AnyEndpoint) in endpoint.request! })
-
         CSRFToken = Property(
             initial: nil,
             then: authentication.map({ authentication in
@@ -60,14 +58,11 @@ public final class APIClient
                 .concat(timer(interval: .seconds(3600), on: QueueScheduler.main).map({ _ in () }))
 
                 // request a CSRF token
-                .flatMap(.latest, transform: { _ -> SignalProducer<String, NoError> in
-                    let output = loggingSession.endpointProducer(for: CSRFEndpoint(purpose: .authenticated(authentication)))
-
-                    return output
+                .flatMap(.latest, transform: { _ -> SignalProducer<String?, NoError> in
+                    loggingSession.endpointProducer(for: CSRFEndpoint(purpose: .authenticated(authentication)))
                         .map({ $0.token })
                         .flatMapError({ _ in SignalProducer.empty })
                 })
-                .map({ $0 })
             }) ?? SignalProducer.empty
         )
     }
