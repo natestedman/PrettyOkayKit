@@ -179,7 +179,7 @@ extension WantClient
                 switch clientState
                 {
                 case .wanted:
-                    return .Wanted
+                    return .wanted
                 case let .modifying(_, want):
                     return want ? .modifyingToWanted : .modifyingToNotWanted
                 }

@@ -23,7 +23,7 @@ public enum WantState
     case notWanted
 
     /// The user wants the product.
-    case Wanted
+    case wanted
 
     /// The client is modifying the product's want state to `NotWanted`.
     case modifyingToNotWanted
@@ -36,26 +36,26 @@ extension WantState
 {
     // MARK: - Want State
 
-    /// `true` if the value is `Wanted` or `ModifyingToWanted`.
-    public var wanted: Bool
+    /// `true` if the value is `wanted` or `modifyingToWanted`.
+    public var isWanted: Bool
     {
         switch self
         {
-        case .Wanted, .modifyingToWanted:
+        case .wanted, .modifyingToWanted:
             return true
         case .notWanted, .modifyingToNotWanted:
             return false
         }
     }
 
-    /// `true` if the value `ModifyingToNotWanted` or `ModifyingToWanted`.
-    public var modifying: Bool
+    /// `true` if the value `modifyingToNotWanted` or `modifyingToWanted`.
+    public var isModifying: Bool
     {
         switch self
         {
         case .modifyingToWanted, .modifyingToNotWanted:
             return true
-        case .Wanted, .notWanted:
+        case .wanted, .notWanted:
             return false
         }
     }
