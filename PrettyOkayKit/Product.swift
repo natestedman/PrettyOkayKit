@@ -99,7 +99,7 @@ extension Product: Decoding
     {
         // fall back on neutral gender if not parsed correctly, gendered items are silly anyways
         let genderString: String? = try? encoded.decode("gender")
-        let gender = genderString.flatMap({ string in Gender(rawValue: string) }) ?? .Neutral
+        let gender = genderString.flatMap({ Gender(rawValue: $0) }) ?? .neutral
 
         // if this is a product associated with a `Good`, determine its deletion path
         let linksToUse: [String:Any]? = try? links ?? encoded.decode("_links")

@@ -122,10 +122,10 @@ extension OffsetPage: QueryItemsRepresentable
 public enum Order: String
 {
     /// Alphabetical order.
-    case Alphabetical = "alphabetical"
+    case alphabetical = "alphabetical"
 
     /// Newest items first.
-    case Newest = "newest"
+    case newest = "newest"
 }
 
 extension Order: QueryItemsRepresentable

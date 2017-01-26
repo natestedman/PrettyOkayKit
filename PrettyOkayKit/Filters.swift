@@ -244,13 +244,13 @@ public enum Gender: String
     // MARK: - Items
 
     /// Women's products.
-    case Female = "female"
+    case female = "female"
 
     /// Men's products.
-    case Male = "male"
+    case male = "male"
 
     /// Gender-neutral products (aren't they all?).
-    case Neutral = "neutral"
+    case neutral = "neutral"
 }
 
 extension Gender: CustomStringConvertible
@@ -260,11 +260,11 @@ extension Gender: CustomStringConvertible
     {
         switch self
         {
-        case .Female:
+        case .female:
             return "Women's"
-        case .Male:
+        case .male:
             return "Men's"
-        case .Neutral:
+        case .neutral:
             return "Neutral"
         }
     }
@@ -280,7 +280,7 @@ extension Gender: FilterComponent
     /// All available gender filters.
     public static var all: [Gender]
     {
-        return [.Female, .Male, .Neutral]
+        return [.female, .male, .neutral]
     }
 }
 
